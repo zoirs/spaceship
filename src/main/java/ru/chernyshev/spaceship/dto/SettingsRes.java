@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
 
+//todo возможо нет надобности
 public class SettingsRes {
 
     private Map<String, SettingsValues> result;

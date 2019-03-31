@@ -2,6 +2,7 @@ package ru.chernyshev.spaceship.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+//todo возможо нет надобности
 public class SettingsReq {
     private String key;
     private Integer value;

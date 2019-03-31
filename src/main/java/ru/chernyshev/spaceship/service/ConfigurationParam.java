@@ -16,11 +16,9 @@ public enum ConfigurationParam {
     ;
 
     private final String key;
-
     private final int max;
     private final int min;
     private final boolean containsInTelemetry;
-
 
     ConfigurationParam(String key, int min, int max, boolean containsInTelemetry) {
         this.key = key;
@@ -44,6 +42,23 @@ public enum ConfigurationParam {
             }
         }
         return null;
+    }
+
+    public static boolean isValid(String key, Integer value) {
+        if (value == null) {
+            return false;
+        }
+        ConfigurationParam param = getValueFor(key);
+        if (param == null){
+            return false;
+        }
+        if (param.min > value){
+            return false;
+        }
+        if (param.max < value){
+            return false;
+        }
+        return true;
     }
 
     public static boolean isExist(String key) {

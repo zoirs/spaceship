@@ -18,23 +18,17 @@ public class FlyProgramm {
     @JsonProperty("operations")
     private List<Operation> operations = null;
 
-//    @JsonProperty("startUp")
     public Integer getStartUp() {
         return startUp;
     }
 
-//    @JsonProperty("startUp")
+    //todo для теста
     public void setStartUp(Integer startUp) {
         this.startUp = startUp;
     }
 
-//    @JsonProperty("operations")
     public List<Operation> getOperations() {
         return operations;
     }
 
-//    @JsonProperty("operations")
-    public void setOperations(List<Operation> operations) {
-        this.operations = operations;
-    }
 }

@@ -1,10 +1,12 @@
 package ru.chernyshev.spaceship;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
@@ -24,6 +26,21 @@ public class SpaceshipApplication {
         return restTemplateBuilder
                 .setConnectTimeout(Duration.ofMillis(timeout))
                 .setReadTimeout(Duration.ofMillis(timeout))
+                .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                 .build();
+    }
+
+    @Bean
+    public Integer telemetryFreq(@Value("${TELEMETRY_FREQ:10}") int telemetryFreqDefault) {
+        String telemetryFreq = System.getenv("TELEMETRY_FREQ");
+        if (Strings.isEmpty(telemetryFreq)) {
+            return telemetryFreqDefault;
+        }
+        try {
+            return Integer.valueOf(telemetryFreq);
+        } catch (NumberFormatException ignore) {
+        }
+
+        return telemetryFreqDefault;
     }
 }

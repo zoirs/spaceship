@@ -27,7 +27,7 @@
       "id": 4,
       "deltaT": 3,
       "variable": "orientationAzimuthAngleDeg",
-      "value": 0,
+      "value": 10,
       "timeout": 10
     }
   ]
