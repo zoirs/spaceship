@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import ru.chernyshev.spaceship.dto.LogDto;
+import ru.chernyshev.spaceship.dto.ResponseBuilder;
 import ru.chernyshev.spaceship.service.ConfigurationParam;
 import ru.chernyshev.spaceship.service.MessageSender;
 import ru.chernyshev.spaceship.service.SpaceshipService;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static ru.chernyshev.spaceship.service.ConfigurationParam.getValueFor;
 
 @RestController
 public class SpaceshipController {
@@ -47,12 +49,19 @@ public class SpaceshipController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(invalidParams));
         }
 
+        ResponseBuilder responseBuilder = new ResponseBuilder();
+
         for (Map.Entry<String, Integer> p : param.entrySet()) {
-            spaceshipService.setConfigurationParam(ConfigurationParam.getValueFor(p.getKey()), p.getValue());
+            ConfigurationParam key = getValueFor(p.getKey());
+            Integer oldValue = spaceshipService.getConfiguration(key);
+            Integer newValue = p.getValue();
+
+            spaceshipService.setConfigurationParam(key, newValue);
+            responseBuilder.add(p.getKey(), newValue, oldValue);
         }
         messageSender.stdout(LogDto.trace("Change setting successfully"));
 
-        return ResponseEntity.ok(objectMapper.writeValueAsString(param));
+        return ResponseEntity.ok(objectMapper.writeValueAsString(responseBuilder));
 
     }
 }

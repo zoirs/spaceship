@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.chernyshev.spaceship.dto.FlyProgramm;
-import ru.chernyshev.spaceship.dto.SettingsRes;
+import ru.chernyshev.spaceship.dto.ResponseBuilder;
 
 import java.io.IOException;
 import java.net.URL;
@@ -47,7 +47,8 @@ public class DtoParseTest {
     public void test1() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        SettingsRes deg = new SettingsRes("orientationZenithAngleDeg", "180", "200");
+        ResponseBuilder deg = new ResponseBuilder();
+        deg.add("orientationZenithAngleDeg", 180, 200);
         String s = objectMapper.writeValueAsString(deg);
 
         System.out.println("");

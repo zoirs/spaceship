@@ -25,6 +25,10 @@ public class SpaceshipService {
         return true;
     }
 
+    public Integer getConfiguration(ConfigurationParam key) {
+        return configuration.get(key);
+    }
+
     public EnumMap<ConfigurationParam, Integer> getConfiguration() {
         return configuration;
     }
