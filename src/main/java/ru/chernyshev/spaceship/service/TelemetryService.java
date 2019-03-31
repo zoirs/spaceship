@@ -29,18 +29,21 @@ public class TelemetryService {
     }
 
     public void start() {
-        scheduler.scheduleAtFixedRate(()->{
-            List<BasicNameValuePair> telemetryParams = spaceshipService.getConfiguration().entrySet().stream()
-                    .filter(p -> p.getKey().isContainsInTelemetry())
-                    .map(p -> new BasicNameValuePair(p.getKey().name(), p.getValue().toString()))
-                    .collect(Collectors.toList());
-            String format = URLEncodedUtils.format(telemetryParams, "UTF-8");
-            send(TelemetryType.VALUES, format);}, telemetryFreq, telemetryFreq, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::sendTelemetry, telemetryFreq, telemetryFreq, TimeUnit.SECONDS);
     }
 
     public void send(TelemetryType type, String message) {
         TelemetryDto telemetry = new TelemetryDto(type, message);
         messageSender.stderr(telemetry.toJson());
+    }
+
+    private void sendTelemetry() {
+        List<BasicNameValuePair> telemetryParams = spaceshipService.getConfiguration().entrySet().stream()
+                .filter(p -> p.getKey().isContainsInTelemetry())
+                .map(p -> new BasicNameValuePair(p.getKey().name(), String.valueOf(p.getValue())))
+                .collect(Collectors.toList());
+        String format = URLEncodedUtils.format(telemetryParams, "UTF-8");
+        send(TelemetryType.VALUES, format);
     }
 
 //    public void send(TelemetryType type, Map<String, Integer> params) {

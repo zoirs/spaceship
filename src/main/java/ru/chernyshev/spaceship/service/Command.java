@@ -54,6 +54,7 @@ public class Command implements Runnable {
             telemetryService.send(TelemetryType.ERROR, errorMessage);
         }
 
+        //todo через operation.timeout проверить что значение совпадает с выставленным
         messageSender.stdout(LogDto.trace("Finish execut command: " + getCurrentOperations()));
     }
 

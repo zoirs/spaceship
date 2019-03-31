@@ -2,14 +2,19 @@ package ru.chernyshev.spaceship.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.chernyshev.spaceship.dto.ConfigurationValues;
 import ru.chernyshev.spaceship.dto.LogDto;
 
-import java.util.EnumMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import static java.util.stream.Collectors.toMap;
 
 @Service
 public class SpaceshipService {
 
-    private final EnumMap<ConfigurationParam, Integer> configuration = new EnumMap<>(ConfigurationParam.class);
+    private final ConcurrentMap<ConfigurationParam, ConfigurationValues> configuration = new ConcurrentHashMap<>();
 
     private final MessageSender messageSender;
 
@@ -19,17 +24,48 @@ public class SpaceshipService {
     }
 
     public boolean setConfigurationParam(ConfigurationParam key, int value) {
-        configuration.put(key, value);
+
+        setNewValue(key, value);
+
+        setActualValue(key);
+
         String message = String.format("key %s was changed %s", key, value);
         messageSender.stdout(LogDto.trace(message));
         return true;
     }
 
-    public Integer getConfiguration(ConfigurationParam key) {
+    private void setNewValue(ConfigurationParam key, int value) {
+        ConfigurationValues param = configuration.get(key);
+        if (param == null) {
+            configuration.put(key, new ConfigurationValues(value));
+        } else {
+            param.update(value);
+            configuration.put(key, param);
+        }
+    }
+
+    /**
+     * Для иммитации физической системы делаем задержу в выставлении актуального значения
+     */
+    private void setActualValue(ConfigurationParam key) {
+        new Thread(() -> {
+            try {
+                Thread.sleep((long) (Math.random() * 1000));
+            } catch (InterruptedException ignore) {
+            }
+            ConfigurationValues param = configuration.get(key);
+            param.setActualValue();
+            configuration.putIfAbsent(key, param);
+        }).start();
+    }
+
+    public ConfigurationValues getConfiguration(ConfigurationParam key) {
         return configuration.get(key);
     }
 
-    public EnumMap<ConfigurationParam, Integer> getConfiguration() {
-        return configuration;
+    public Map<ConfigurationParam, Integer> getConfiguration() {
+        return configuration.entrySet()
+                .stream()
+                .collect(toMap(Map.Entry::getKey, o-> o.getValue().getValue()));
     }
 }

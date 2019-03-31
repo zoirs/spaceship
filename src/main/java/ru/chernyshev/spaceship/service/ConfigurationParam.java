@@ -16,6 +16,7 @@ public enum ConfigurationParam {
     ;
 
     private final String key;
+
     private final int max;
     private final int min;
     private final boolean containsInTelemetry;
@@ -63,5 +64,9 @@ public enum ConfigurationParam {
 
     public static boolean isExist(String key) {
         return getValueFor(key) != null;
+    }
+
+    public String getKey() {
+        return key;
     }
 }

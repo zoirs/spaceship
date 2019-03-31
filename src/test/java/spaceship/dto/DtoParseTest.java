@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
+import ru.chernyshev.spaceship.dto.ConfigurationValues;
 import ru.chernyshev.spaceship.dto.FlyProgramm;
-import ru.chernyshev.spaceship.dto.ResponseBuilder;
+import ru.chernyshev.spaceship.dto.Response;
 
 import java.io.IOException;
 import java.net.URL;
@@ -47,9 +48,9 @@ public class DtoParseTest {
     public void test1() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        ResponseBuilder deg = new ResponseBuilder();
-        deg.add("orientationZenithAngleDeg", 180, 200);
-        String s = objectMapper.writeValueAsString(deg);
+        Response.Builder responseBuilder = Response.newBuilder();
+        responseBuilder.add("orientationZenithAngleDeg", new ConfigurationValues(180));
+        String s = objectMapper.writeValueAsString(responseBuilder .build());
 
         System.out.println("");
         System.out.println(s);
