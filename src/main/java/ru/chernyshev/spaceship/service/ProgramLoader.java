@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.chernyshev.spaceship.dto.FlyProgramm;
@@ -13,6 +11,7 @@ import ru.chernyshev.spaceship.dto.LogDto;
 import ru.chernyshev.spaceship.dto.Operation;
 
 import javax.validation.Valid;
+import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
@@ -31,16 +30,23 @@ public class ProgramLoader {
     private final RestTemplate restTemplate;
     private final TelemetryService telemetryService;
     private final ObjectMapper objectMapper;
+    private final String flightProgramPath;
 
     private final ScheduledExecutorService executor;
-    private FlyProgramm flyProgramm;
+
+    private FlyProgramm flyProgram;
 
     @Autowired
-    public ProgramLoader(RestTemplate restTemplate, TelemetryService telemetryService, MessageSender messageSender,ObjectMapper objectMapper) {
+    public ProgramLoader(RestTemplate restTemplate,
+                         TelemetryService telemetryService,
+                         MessageSender messageSender,
+                         ObjectMapper objectMapper,
+                         String flightProgramPath) {
         this.restTemplate = restTemplate;
         this.telemetryService = telemetryService;
         this.messageSender = messageSender;
         this.objectMapper = objectMapper;
+        this.flightProgramPath = flightProgramPath;
 
         this.executor = Executors.newScheduledThreadPool(5);
     }
@@ -49,9 +55,14 @@ public class ProgramLoader {
     public void init() {
         messageSender.stdout(LogDto.trace("Start program loading"));
 
-        Resource resource = new ClassPathResource("programm.json");// todo грузить с переменной окружения
+        File fileProgram = new File(flightProgramPath);
+        if (!fileProgram.exists() || !fileProgram.isFile()) {
+            telemetryService.send(TelemetryType.ERROR, "Fly program not found " + flightProgramPath);
+            return;
+        }
+
         try {
-            flyProgramm = objectMapper.readValue(resource.getFile(), FlyProgramm.class);
+            flyProgram = objectMapper.readValue(fileProgram, FlyProgramm.class);
         } catch (IOException e) {
             telemetryService.send(TelemetryType.ERROR, "Cant read programm " + e.getMessage());
             return;
@@ -59,8 +70,12 @@ public class ProgramLoader {
         //todo проверить валидность, проверить сущестование файла
         messageSender.stdout(LogDto.trace("Finish program loading"));
         telemetryService.start();
-        flyProgramm.setStartUp((int) (new Date().getTime()/1000)); // todo убрать, это для теста
-        execute(flyProgramm);
+        flyProgram.setStartUp((int) (new Date().getTime()/1000)); // todo убрать, это для теста
+        execute(flyProgram);
+    }
+
+    public FlyProgramm getFlyProgram() {
+        return flyProgram;
     }
 
     private void execute(@Valid FlyProgramm flyProgramm) {
@@ -81,8 +96,8 @@ public class ProgramLoader {
         }
         messageSender.stdout(LogDto.trace("Execute program scheduled"));
     }
+
     private long getDelay(Date startupDate, Integer delayAfterStartup) {
         return new Date().getTime() - startupDate.getTime() + delayAfterStartup * 1000;
     }
-
 }

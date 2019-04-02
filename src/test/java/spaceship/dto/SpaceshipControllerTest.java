@@ -6,11 +6,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.chernyshev.spaceship.SpaceshipApplication;
 import ru.chernyshev.spaceship.controller.SpaceshipController;
 import ru.chernyshev.spaceship.service.ConfigurationParam;
+import ru.chernyshev.spaceship.service.MessageSender;
+import ru.chernyshev.spaceship.service.SpaceshipService;
 
 import java.util.HashMap;
 import java.util.StringJoiner;
@@ -19,13 +22,38 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SpaceshipApplication.class)
+@SpringBootTest(classes = SpaceshipControllerTest.SpaceshipControllerTestConfiguration.class)
 @AutoConfigureMockMvc
 public class SpaceshipControllerTest {
 
+    @Configuration
+    static class SpaceshipControllerTestConfiguration {
+
+        @Bean
+        public ObjectMapper objectMapper() {
+            return new ObjectMapper();
+        }
+
+        @Bean
+        public MessageSender messageSender(ObjectMapper objectMapper) {
+            return new MessageSender(objectMapper);
+        }
+
+        @Bean
+        public SpaceshipService spaceshipService(MessageSender messageSender) {
+            return new SpaceshipService(messageSender);
+        }
+
+        @Bean
+        public SpaceshipController orderService(SpaceshipService spaceshipService, ObjectMapper objectMapper,MessageSender messageSender) {
+            return new SpaceshipController(spaceshipService, objectMapper, messageSender);
+        }
+    }
+
     @Autowired
     private SpaceshipController spaceshipController;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     public void getValidParam() throws Exception {

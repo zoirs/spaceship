@@ -27,8 +27,9 @@ public class ConfigurationValues {
         this.set = set;
     }
 
-    public void update(int set){
+    public ConfigurationValues update(int set){
         this.set = set;
+        return this;
     }
 
     public void setActualValue(){

@@ -43,4 +43,13 @@ public class SpaceshipApplication {
 
         return telemetryFreqDefault;
     }
+
+    @Bean
+    public String flightProgramPath(@Value("${FLIGHT_PROGRAM}") String flightProgramDefault) {
+        String flightProgram = System.getenv("FLIGHT_PROGRAM");
+        if (Strings.isEmpty(flightProgram)) {
+            return flightProgramDefault;
+        }
+        return flightProgram;
+    }
 }

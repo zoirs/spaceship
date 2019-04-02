@@ -40,19 +40,9 @@ public class TelemetryService {
     private void sendTelemetry() {
         List<BasicNameValuePair> telemetryParams = spaceshipService.getConfiguration().entrySet().stream()
                 .filter(p -> p.getKey().isContainsInTelemetry())
-                .map(p -> new BasicNameValuePair(p.getKey().name(), String.valueOf(p.getValue())))
+                .map(p -> new BasicNameValuePair(p.getKey().name(), String.valueOf(p.getValue().getValue())))
                 .collect(Collectors.toList());
         String format = URLEncodedUtils.format(telemetryParams, "UTF-8");
         send(TelemetryType.VALUES, format);
     }
-
-//    public void send(TelemetryType type, Map<String, Integer> params) {
-//        List<BasicNameValuePair> collect = params.entrySet().stream()
-//                .map(p -> new BasicNameValuePair(p.getKey(), p.getValue().toString()))
-//                .collect(Collectors.toList());
-//        String format = URLEncodedUtils.format(collect, "UTF-8");
-//
-//        TelemetryDto telemetry = new TelemetryDto(type, format);
-//        messageSender.stderr(telemetry.toJson());
-//    }
 }
