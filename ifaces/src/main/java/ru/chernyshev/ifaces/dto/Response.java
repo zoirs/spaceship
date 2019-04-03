@@ -1,5 +1,6 @@
 package ru.chernyshev.ifaces.dto;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.HashMap;
@@ -18,6 +19,11 @@ public class Response {
         return response;
     }
 
+    @JsonAnySetter
+    public void add(String key, ConfigurationValues value) {
+        response.put(key, value);
+    }
+
     public static Builder newBuilder() {
         return new Response().new Builder();
     }
@@ -28,7 +34,7 @@ public class Response {
         }
 
         public void add(String key, ConfigurationValues values) {
-            Response.this.response.put(key, values);
+            Response.this.add(key, values);
         }
 
         public Response build() {

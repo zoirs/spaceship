@@ -5,7 +5,7 @@ import org.apache.logging.log4j.util.Strings;
 public enum ConfigurationParam {
 
     RADIO_POWER_DBM("radioPowerDbm", 0, 0, false),
-    COOLING_SYSTEM_POWER_PCT("coolingSystemPowerPct", 0, 0, false),
+    COOLING_SYSTEM_POWER_PCT("coolingSystemPowerPct", 0, 40, false),
     MAIN_ENGINE_THRUST_PCT("mainEngineThrustPct", 0, 0, false),
     ORIENTATION_ZENITH_ANGLE_DEG("orientationZenithAngleDeg", 0, 0, true),
     ORIENTATION_AZIMUTH_ANGLE_DEG("orientationAzimuthAngleDeg", 0, 0, true),

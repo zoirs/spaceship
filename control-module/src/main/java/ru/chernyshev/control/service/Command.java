@@ -8,8 +8,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-import ru.chernyshev.control.model.Log;
 import ru.chernyshev.control.dto.Operation;
+import ru.chernyshev.control.model.Log;
+import ru.chernyshev.ifaces.dto.Response;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,8 @@ public class Command implements Runnable {
         }
 
         try {
-            restTemplate.patchForObject("http://localhost:8080/settings", entity, String.class);
+            Response response = restTemplate.patchForObject("http://localhost:9090/settings", entity, Response.class);
+            messageSender.stdout(Log.trace("Get response: " + (response != null ? response.getResponse() : "")));
         } catch (ResourceAccessException e) {
             String errorMessage = String.format("Cant get resource. Ids: %s. Error: %s ", getCurrentOperations(), e.getMessage());
             telemetryService.send(TelemetryType.ERROR, errorMessage);
