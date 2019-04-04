@@ -12,8 +12,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 import ru.chernyshev.control.service.MessageSender;
 import ru.chernyshev.control.service.ProgramLoader;
+import ru.chernyshev.control.service.RestClientService;
 import ru.chernyshev.control.service.TelemetryService;
+import ru.chernyshev.ifaces.dto.Response;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -37,6 +40,12 @@ public class ProgramLoaderTest {
         }
 
         @Bean
+        public RestClientService restClientService(RestTemplate restTemplate)
+        {
+            return new RestClientService(restTemplate, "");
+        }
+
+        @Bean
         public RestTemplate restTemplate() {
             return new RestTemplate();
         }
@@ -47,10 +56,10 @@ public class ProgramLoaderTest {
         }
 
         @Bean
-        public ProgramLoader programLoader(RestTemplate restTemplate, MessageSender messageSender, ObjectMapper objectMapper) throws UnsupportedEncodingException {
+        public ProgramLoader programLoader(RestClientService restrestClientService, MessageSender messageSender, ObjectMapper objectMapper) throws UnsupportedEncodingException {
             URL resource = this.getClass().getResource("/programm.json");
             String path = URLDecoder.decode(resource.getFile(), "UTF-8");
-            return new ProgramLoader(restTemplate, mock(TelemetryService.class), messageSender, objectMapper, path);
+            return new ProgramLoader(restrestClientService, mock(TelemetryService.class), messageSender, objectMapper, path);
         }
     }
 
@@ -78,5 +87,13 @@ public class ProgramLoaderTest {
         assertThat(operation.getVariable(), is("coolingSystemPowerPercent"));
         assertThat(operation.getValue(), is(30));
         assertThat(operation.getTimeout(), is(1));
+    }
+
+    @Test
+    public void responseParseTest() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = "{\"coolingSystemPowerPct\":{\"set\":30,\"value\":11}}";
+        Response response = objectMapper.readValue(json, Response.class);
+        assertThat(response.getResponse().size(), is(1));
     }
 }

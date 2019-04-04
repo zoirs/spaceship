@@ -19,10 +19,9 @@ public class ConfigurationValues {
     @JsonProperty("value")
     private Integer value;
 
-    public ConfigurationValues(int set, int value) {
-        this.set = set;
-        this.value = value;
+    protected ConfigurationValues() {
     }
+
     public ConfigurationValues(int set) {
         this.set = set;
     }
@@ -40,7 +39,7 @@ public class ConfigurationValues {
         return set;
     }
 
-    public int getValue() {
+    public Integer getValue() {
         return value;
     }
 }

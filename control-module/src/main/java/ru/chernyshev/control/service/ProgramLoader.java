@@ -27,7 +27,7 @@ import static java.util.stream.Collectors.groupingBy;
 public class ProgramLoader {
 
     private final MessageSender messageSender;
-    private final RestTemplate restTemplate;
+    private final RestClientService restClientService;
     private final TelemetryService telemetryService;
     private final ObjectMapper objectMapper;
     private final String flightProgramPath;
@@ -37,12 +37,12 @@ public class ProgramLoader {
     private FlyProgramm flyProgram;
 
     @Autowired
-    public ProgramLoader(RestTemplate restTemplate,
+    public ProgramLoader(RestClientService restClientService,
                          TelemetryService telemetryService,
                          MessageSender messageSender,
                          ObjectMapper objectMapper,
                          String flightProgramPath) {
-        this.restTemplate = restTemplate;
+        this.restClientService = restClientService;
         this.telemetryService = telemetryService;
         this.messageSender = messageSender;
         this.objectMapper = objectMapper;
@@ -68,6 +68,9 @@ public class ProgramLoader {
             return;
         }
         //todo проверить валидность, проверить сущестование файла
+        if (false) {
+            System.exit(ExitCodes.PROGRAM_NOT_CORRECT.getExitCode());
+        }
         messageSender.stdout(Log.trace("Finish program loading"));
         telemetryService.start();
         flyProgram.setStartUp((int) (new Date().getTime()/1000)); // todo убрать, это для теста
@@ -91,7 +94,7 @@ public class ProgramLoader {
             long delay = getDelay(startupDate, entry.getKey());
 
             executor.schedule(
-                    new Command(restTemplate, telemetryService, entry.getValue(), messageSender) // todo мб создавать внутри?
+                    new ExecuteOperationCommand(telemetryService, entry.getValue(), messageSender, restClientService)
                     , delay, TimeUnit.MILLISECONDS);
         }
         messageSender.stdout(Log.trace("Execute program scheduled"));

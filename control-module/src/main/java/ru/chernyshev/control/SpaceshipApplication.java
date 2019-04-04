@@ -45,6 +45,15 @@ public class SpaceshipApplication {
     }
 
     @Bean
+    public String exchangeUri(@Value("${EXCHANGE_URI:10}") String exchangeUriDefault) {
+        String exchangeUri = System.getenv("EXCHANGE_URI");
+        if (Strings.isEmpty(exchangeUri)) {
+            return exchangeUriDefault;
+        }
+        return exchangeUriDefault;
+    }
+
+    @Bean
     public String flightProgramPath(@Value("${FLIGHT_PROGRAM}") String flightProgramDefault) {
         String flightProgram = System.getenv("FLIGHT_PROGRAM");
         if (Strings.isEmpty(flightProgram)) {
