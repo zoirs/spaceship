@@ -84,7 +84,7 @@ public class ProgramLoaderTest {
         Operation operation = flyProgram.getOperations().get(0);
         assertThat(operation.getId(), is(1));
         assertThat(operation.getDeltaT(), is(0));
-        assertThat(operation.getVariable(), is("coolingSystemPowerPercent"));
+        assertThat(operation.getVariable(), is("coolingSystemPowerPct"));
         assertThat(operation.getValue(), is(30));
         assertThat(operation.getTimeout(), is(1));
     }

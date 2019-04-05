@@ -1,11 +1,7 @@
 package ru.chernyshev.satelite.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-//import ru.chernyshev.control.dto.ConfigurationValues;
-//import ru.chernyshev.control.dto.Log;
 import ru.chernyshev.ifaces.dto.ConfigurationValues;
-import ru.chernyshev.satelite.model.Log;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,36 +10,28 @@ import java.util.concurrent.ConcurrentMap;
 @Service
 public class SpaceshipService {
 
-    private final ConcurrentMap<ConfigurationParam, ConfigurationValues> configuration = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, ConfigurationValues> configuration = new ConcurrentHashMap<>();
 
-    private final MessageSender messageSender;
-
-    @Autowired
-    public SpaceshipService(MessageSender messageSender) {
-        this.messageSender = messageSender;
-    }
-
-    public void setConfigurationParam(ConfigurationParam key, int value) {
+    public void setConfigurationParam(String key, int value) {
         configuration.merge(key, new ConfigurationValues(value), (oldValue, currValue) -> oldValue.update(value));
 
         setActualValue(key);
 
-        String message = String.format("key %s was changed %s", key, value);
-        messageSender.stdout(Log.trace(message));
+        System.out.println(String.format("key %s was changed %s", key, value));
     }
 
-    public ConfigurationValues getConfiguration(ConfigurationParam key) {
+    public ConfigurationValues getConfiguration(String key) {
         return configuration.get(key);
     }
 
-    public HashMap<ConfigurationParam, ConfigurationValues> getConfiguration() {
+    public HashMap<String, ConfigurationValues> getConfiguration() {
         return new HashMap<>(configuration);
     }
 
     /**
      * Для иммитации физической системы делаем задержу в выставлении актуального значения
      */
-    private void setActualValue(ConfigurationParam key) {
+    private void setActualValue(String key) {
         new Thread(() -> {
             try {
                 Thread.sleep((long) (Math.random() * 1000));

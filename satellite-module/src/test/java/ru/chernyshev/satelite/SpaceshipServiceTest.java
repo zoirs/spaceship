@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.chernyshev.ifaces.dto.ConfigurationValues;
-import ru.chernyshev.satelite.service.ConfigurationParam;
-import ru.chernyshev.satelite.service.MessageSender;
 import ru.chernyshev.satelite.service.SpaceshipService;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -32,13 +30,8 @@ public class SpaceshipServiceTest {
         }
 
         @Bean
-        public MessageSender messageSender(ObjectMapper objectMapper) {
-            return new MessageSender(objectMapper);
-        }
-
-        @Bean
-        public SpaceshipService spaceshipService(MessageSender messageSender) {
-            return new SpaceshipService(messageSender);
+        public SpaceshipService spaceshipService() {
+            return new SpaceshipService();
         }
     }
 
@@ -47,17 +40,15 @@ public class SpaceshipServiceTest {
 
     @Test
     public void setOneParamTest() {
-        ConfigurationParam param = ConfigurationParam.MAIN_ENGINE_FUEL_PCT;
-        spaceshipService.setConfigurationParam(param, 100);
+        spaceshipService.setConfigurationParam("mainEngineFuelPct", 100);
         assertThat(spaceshipService.getConfiguration().size(), is(1));
     }
 
     @Test
     public void setOneParamValueTest() {
-        ConfigurationParam param = ConfigurationParam.MAIN_ENGINE_FUEL_PCT;
-        spaceshipService.setConfigurationParam(param, 100);
+        spaceshipService.setConfigurationParam("mainEngineFuelPct", 100);
 
-        ConfigurationValues configuration = spaceshipService.getConfiguration(param);
+        ConfigurationValues configuration = spaceshipService.getConfiguration("mainEngineFuelPct");
 
         assertNotNull(configuration);
         assertThat(configuration.getSet(), is(100));
