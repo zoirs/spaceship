@@ -1,11 +1,5 @@
 package ru.chernyshev.control.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.web.client.RestTemplate;
 import ru.chernyshev.control.dto.Operation;
 import ru.chernyshev.control.model.Log;
 import ru.chernyshev.ifaces.dto.Response;
@@ -19,7 +13,9 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
-public class ExecuteOperationCommand implements Runnable {
+public class OperationExecuteCommand implements Runnable {
+
+    private static final String PREFIX_MSG = "Execute operation.";
 
     private final List<Operation> operations;
     private final TelemetryService telemetryService;
@@ -27,7 +23,8 @@ public class ExecuteOperationCommand implements Runnable {
     private final ScheduledExecutorService executor;
     private final RestClientService restClientService;
 
-    public ExecuteOperationCommand(TelemetryService telemetryService, List<Operation> operations, MessageSender messageSender, RestClientService restClientService) {
+
+    public OperationExecuteCommand(TelemetryService telemetryService, List<Operation> operations, MessageSender messageSender, RestClientService restClientService) {
         this.telemetryService = telemetryService;
         this.operations = operations;
         this.messageSender = messageSender;
@@ -38,12 +35,12 @@ public class ExecuteOperationCommand implements Runnable {
 
     @Override
     public void run() {
-        messageSender.stdout(Log.trace("Start execut command: " + getCurrentOperations()));
+        messageSender.stdout(Log.trace(PREFIX_MSG + " Start: " + getCurrentOperations()));
 
         Map<String, Integer> requestParam = operations.stream()
                 .collect(Collectors.toMap(Operation::getVariable, Operation::getValue));
 
-        messageSender.stdout(Log.info("Execute command with param: " + requestParam));
+        messageSender.stdout(Log.info(PREFIX_MSG + " Params: " + requestParam));
 
         Response response = null;
         Error apiError = null;
@@ -55,13 +52,13 @@ public class ExecuteOperationCommand implements Runnable {
         }
 
         if (apiError != null) {
-            telemetryService.send(TelemetryType.ERROR, apiError.getMessage());
-            if (apiError.isCritical()){
+            telemetryService.send(TelemetryType.ERROR, PREFIX_MSG + apiError.getMessage());
+            if (apiError.isCritical()) {
                 System.exit(apiError.getExitCode());
             }
         }
 
-        messageSender.stdout(Log.trace("Get response: " + (response != null ? response.getResponse() : "")));
+        messageSender.stdout(Log.trace(PREFIX_MSG + " Get response: " + (response != null ? response.getResponse() : "")));
 
         Map<Integer, List<Operation>> operationsByTimeout = operations
                 .stream()
@@ -71,11 +68,11 @@ public class ExecuteOperationCommand implements Runnable {
             Integer timeout = entry.getKey();
 
             executor.schedule(
-                    new ExecuteOperationCheckCommand(restClientService, telemetryService, entry.getValue(), messageSender)
+                    new OperationExecutingCheckCommand(restClientService, telemetryService, entry.getValue(), messageSender)
                     , timeout, TimeUnit.MILLISECONDS);
         }
 
-        messageSender.stdout(Log.trace("Finish execut command: " + getCurrentOperations()));
+        messageSender.stdout(Log.trace(PREFIX_MSG + "Complete for ids: " + getCurrentOperations()));
     }
 
     private String getCurrentOperations() {

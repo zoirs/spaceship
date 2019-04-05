@@ -42,4 +42,12 @@ public class ConfigurationValues {
     public Integer getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "ConfigurationValues{" +
+                "set=" + set +
+                ", value=" + value +
+                '}';
+    }
 }

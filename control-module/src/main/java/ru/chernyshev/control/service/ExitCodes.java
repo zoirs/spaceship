@@ -3,9 +3,9 @@ package ru.chernyshev.control.service;
 public enum ExitCodes {
 
     SUCCESS(0),
-    PROGRAM_NOT_CORRECT(1),
+    WRONG_PROGRAM(1),
     API_ANSWER_ERROR(11),
-    PARAMS_NOT_MATCH(12);
+    OPERATION_NOT_EXECUTE(12);
 
     private final Integer exitCode;
 

@@ -5,7 +5,7 @@ public class Operation {
     private Integer id;
     private Integer deltaT;
     private String variable;
-    private Integer value;
+    private int value;
     private Integer timeout;
     private boolean critical;
 
@@ -21,7 +21,7 @@ public class Operation {
         return variable;
     }
 
-    public Integer getValue() {
+    public int getValue() {
         return value;
     }
 
@@ -31,5 +31,17 @@ public class Operation {
 
     public Boolean getCritical() {
         return critical;
+    }
+
+    @Override
+    public String toString() {
+        return "Operation{" +
+                "id=" + id +
+                ", deltaT=" + deltaT +
+                ", variable='" + variable + '\'' +
+                ", value=" + value +
+                ", timeout=" + timeout +
+                ", critical=" + critical +
+                '}';
     }
 }

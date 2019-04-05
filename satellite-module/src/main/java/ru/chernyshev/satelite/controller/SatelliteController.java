@@ -27,14 +27,14 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 //import static ru.chernyshev.control.service.ConfigurationParam.getValueFor;
 
 @RestController
-public class SpaceshipController {
+public class SatelliteController {
 
     private final SpaceshipService spaceshipService;
     private final ObjectMapper objectMapper;
     private final MessageSender messageSender;
 
     @Autowired
-    public SpaceshipController(SpaceshipService spaceshipService, ObjectMapper objectMapper, MessageSender messageSender) {
+    public SatelliteController(SpaceshipService spaceshipService, ObjectMapper objectMapper, MessageSender messageSender) {
         this.spaceshipService = spaceshipService;
         this.objectMapper = objectMapper;
         this.messageSender = messageSender;
@@ -44,15 +44,15 @@ public class SpaceshipController {
     public ResponseEntity<String> setSettings(@RequestBody Map<String, Integer> params) throws Exception {
         messageSender.stdout(Log.trace("Get request change setting"));
 
-        Map<String, Integer> invalidParams = params.entrySet()
-                .stream()
-                .filter(e -> !ConfigurationParam.isValid(e.getKey(), e.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        if (!CollectionUtils.isEmpty(invalidParams)) {
-            messageSender.stdout(Log.error("Invalid params " + invalidParams));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(invalidParams));
-        }
+//        Map<String, Integer> invalidParams = params.entrySet()
+//                .stream()
+//                .filter(e -> !ConfigurationParam.isValid(e.getKey(), e.getValue()))
+//                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+//
+//        if (!CollectionUtils.isEmpty(invalidParams)) {
+//            messageSender.stdout(Log.error("Invalid params " + invalidParams));
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(invalidParams));
+//        }
 
         Response.Builder responseBuilder = Response.newBuilder();
 

@@ -68,19 +68,19 @@ public class ProgramLoaderTest {
 
     @Test
     public void loadOnStartTest() {
-        FlyProgramm flyProgram = programLoader.getFlyProgram();
+        FlyProgram flyProgram = programLoader.getFlyProgram();
         assertNotNull(flyProgram);
     }
 
     @Test
     public void readProgramTest() {
-        FlyProgramm flyProgram = programLoader.getFlyProgram();
+        FlyProgram flyProgram = programLoader.getFlyProgram();
         assertThat(flyProgram.getOperations().size(), is(1));
     }
 
     @Test
     public void readOperationTest() {
-        FlyProgramm flyProgram = programLoader.getFlyProgram();
+        FlyProgram flyProgram = programLoader.getFlyProgram();
         Operation operation = flyProgram.getOperations().get(0);
         assertThat(operation.getId(), is(1));
         assertThat(operation.getDeltaT(), is(0));

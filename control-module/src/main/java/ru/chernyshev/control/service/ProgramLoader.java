@@ -1,14 +1,16 @@
 package ru.chernyshev.control.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import ru.chernyshev.control.dto.FlyProgramm;
+import org.springframework.util.CollectionUtils;
+import ru.chernyshev.control.dto.FlyProgram;
 import ru.chernyshev.control.model.Log;
 import ru.chernyshev.control.dto.Operation;
+import ru.chernyshev.control.utils.OperationValidator;
 
 import javax.validation.Valid;
 import java.io.File;
@@ -20,11 +22,15 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class ProgramLoader {
+
+    private static final String PREFIX_MSG = "Program load. ";
 
     private final MessageSender messageSender;
     private final RestClientService restClientService;
@@ -34,7 +40,7 @@ public class ProgramLoader {
 
     private final ScheduledExecutorService executor;
 
-    private FlyProgramm flyProgram;
+    private FlyProgram flyProgram;
 
     @Autowired
     public ProgramLoader(RestClientService restClientService,
@@ -53,40 +59,56 @@ public class ProgramLoader {
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-        messageSender.stdout(Log.trace("Start program loading"));
+        messageSender.stdout(Log.trace(PREFIX_MSG + "Start read"));
 
         File fileProgram = new File(flightProgramPath);
         if (!fileProgram.exists() || !fileProgram.isFile()) {
-            telemetryService.send(TelemetryType.ERROR, "Fly program not found " + flightProgramPath);
-            return;
+            telemetryService.send(TelemetryType.ERROR, PREFIX_MSG + "Fly program not found " + flightProgramPath);
+            System.exit(ExitCodes.WRONG_PROGRAM.getExitCode());
         }
 
         try {
-            flyProgram = objectMapper.readValue(fileProgram, FlyProgramm.class);
+            flyProgram = objectMapper.readValue(fileProgram, FlyProgram.class);
         } catch (IOException e) {
-            telemetryService.send(TelemetryType.ERROR, "Cant read programm " + e.getMessage());
-            return;
+            telemetryService.send(TelemetryType.ERROR, PREFIX_MSG + "Cant read program " + e.getMessage());
+            System.exit(ExitCodes.WRONG_PROGRAM.getExitCode());
         }
-        //todo проверить валидность, проверить сущестование файла
-        if (false) {
-            System.exit(ExitCodes.PROGRAM_NOT_CORRECT.getExitCode());
+
+        if (flyProgram == null) {
+            telemetryService.send(TelemetryType.ERROR, PREFIX_MSG + "Program is empty");
+            System.exit(ExitCodes.WRONG_PROGRAM.getExitCode());
         }
-        messageSender.stdout(Log.trace("Finish program loading"));
+
+        List<Operation> wrongOperations = flyProgram.getOperations()
+                .stream()
+                .filter(o -> !OperationValidator.isValid(o))
+                .collect(toList());
+
+        if (!CollectionUtils.isEmpty(wrongOperations)) {
+            String wrongOperationIds = wrongOperations.stream().map(Operation::toString)
+                    .collect(Collectors.joining(", "));
+            telemetryService.send(TelemetryType.ERROR, PREFIX_MSG + "Program has wrong param " + wrongOperationIds);
+            System.exit(ExitCodes.WRONG_PROGRAM.getExitCode());
+        }
+
+        messageSender.stdout(Log.trace(PREFIX_MSG + "Finish read program"));
+
         telemetryService.start();
-        flyProgram.setStartUp((int) (new Date().getTime()/1000)); // todo убрать, это для теста
+        flyProgram.setStartUp((int) (new Date().getTime() / 1000)); // todo убрать, это для теста
         execute(flyProgram);
+        messageSender.stdout(Log.trace(PREFIX_MSG + "Finish read"));
     }
 
-    public FlyProgramm getFlyProgram() {
+    public FlyProgram getFlyProgram() {
         return flyProgram;
     }
 
-    private void execute(@Valid FlyProgramm flyProgramm) {
-        messageSender.stdout(Log.trace("Start execute program"));
+    private void execute(@Valid FlyProgram flyProgram) {
+        messageSender.stdout(Log.trace(PREFIX_MSG + "Start execute"));
 
-        Date startupDate = Date.from(Instant.ofEpochSecond(flyProgramm.getStartUp()));
+        Date startupDate = Date.from(Instant.ofEpochSecond(flyProgram.getStartUp()));
 
-        Map<Integer, List<Operation>> operationsByDelays = flyProgramm.getOperations()
+        Map<Integer, List<Operation>> operationsByDelays = flyProgram.getOperations()
                 .stream()
                 .collect(groupingBy(Operation::getDeltaT));
 
@@ -94,10 +116,10 @@ public class ProgramLoader {
             long delay = getDelay(startupDate, entry.getKey());
 
             executor.schedule(
-                    new ExecuteOperationCommand(telemetryService, entry.getValue(), messageSender, restClientService)
+                    new OperationExecuteCommand(telemetryService, entry.getValue(), messageSender, restClientService)
                     , delay, TimeUnit.MILLISECONDS);
         }
-        messageSender.stdout(Log.trace("Execute program scheduled"));
+        messageSender.stdout(Log.trace(PREFIX_MSG + "Execute was schedule"));
     }
 
     private long getDelay(Date startupDate, Integer delayAfterStartup) {

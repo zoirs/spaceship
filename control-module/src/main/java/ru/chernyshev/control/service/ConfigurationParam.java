@@ -4,15 +4,15 @@ import org.apache.logging.log4j.util.Strings;
 
 public enum ConfigurationParam {
 
-    RADIO_POWER_DBM("radioPowerDbm", 0, 0, false),
-    COOLING_SYSTEM_POWER_PCT("coolingSystemPowerPct", 0, 40, false),
-    MAIN_ENGINE_THRUST_PCT("mainEngineThrustPct", 0, 0, false),
-    ORIENTATION_ZENITH_ANGLE_DEG("orientationZenithAngleDeg", 0, 0, true),
-    ORIENTATION_AZIMUTH_ANGLE_DEG("orientationAzimuthAngleDeg", 0, 0, true),
-    VESSEL_ALTITUDE_M("vesselAltitudeM", 0, 0, true),
-    VESSEL_SPEED_MPS("vesselSpeedMps", 0, 0, true),
-    MAIN_ENGINE_FUEL_PCT("mainEngineFuelPct", 0, 0, true),
-    TEMPERATURE_INTERNAL_DEG("temperatureInternalDeg", 0, 0, true),
+    RADIO_POWER_DBM("radioPowerDbm", 20, 80, false),
+    COOLING_SYSTEM_POWER_PCT("coolingSystemPowerPct", 0, 100, false),
+    MAIN_ENGINE_THRUST_PCT("mainEngineThrustPct", 0, 100, false),
+    ORIENTATION_ZENITH_ANGLE_DEG("orientationZenithAngleDeg", 0, 359, true),
+    ORIENTATION_AZIMUTH_ANGLE_DEG("orientationAzimuthAngleDeg", 0, 359, true),
+    VESSEL_ALTITUDE_M("vesselAltitudeM", 0, 35_000_000, true),
+    VESSEL_SPEED_MPS("vesselSpeedMps", 0, 15000, true),
+    MAIN_ENGINE_FUEL_PCT("mainEngineFuelPct", 0, 100, true),
+    TEMPERATURE_INTERNAL_DEG("temperatureInternalDeg", -50, 150, true),
     ;
 
     private final String key;

@@ -11,7 +11,7 @@ import java.util.List;
         "startUp",
         "operations"
 })
-public class FlyProgramm {
+public class FlyProgram {
 
     @JsonProperty("startUp")
     private Integer startUp;

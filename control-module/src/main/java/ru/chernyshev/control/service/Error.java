@@ -3,11 +3,13 @@ package ru.chernyshev.control.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
+import ru.chernyshev.control.dto.FlyProgram;
 import ru.chernyshev.control.dto.Operation;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+//todo валидатор?
 public class Error {
 
     private String message;
@@ -23,7 +25,7 @@ public class Error {
      * Создать объект ошибки взаимодействия с rest сервисом спутника
      */
     public static Error createApiError(List<Operation> operations, Exception e) {
-        Error error = createError(operations);
+        Error error = new Error(isCritical(operations), ExitCodes.API_ANSWER_ERROR);
         String operationIds = getOperationIds(operations);
 
         if (e == null) {
@@ -45,17 +47,20 @@ public class Error {
      * Создать объект ошибки не выполения команды программы
      */
     public static Error createOperationError(List<Operation> operations) {
-        Error error = createError(operations);
-        String operationIds = getOperationIds(operations);
+        Error error = new Error(isCritical(operations), ExitCodes.OPERATION_NOT_EXECUTE);
 
-        error.message = String.format("Time to set a parameter is out. Ids: %s.", operationIds);
-
+        error.message = String.format("Value was not set. Ids: %s.", getOperationIds(operations));
         return error;
     }
 
-    private static Error createError(List<Operation> errorParams) {
-        boolean isCritical = errorParams.stream().anyMatch(Operation::getCritical);
-        return new Error(isCritical, ExitCodes.API_ANSWER_ERROR);
+    public static Error createProgramLoadError(FlyProgram program, Exception e) {
+        Error error = new Error(true, ExitCodes.WRONG_PROGRAM);
+        error.message = String.format("Program not correct. Ids: %s.", e);
+        return error;
+    }
+
+    private static boolean isCritical(List<Operation> errorParams) {
+        return errorParams.stream().anyMatch(Operation::getCritical);
     }
 
     private static String getOperationIds(List<Operation> errorParams) {
