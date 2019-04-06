@@ -1,4 +1,4 @@
-package ru.chernyshev.control.dto;
+package ru.chernyshev.control.program;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

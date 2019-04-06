@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class TelemetryService {
+public class TelemetryService implements ITelemetryService{
 
     private final int telemetryFreq;
     private final MessageSender messageSender;

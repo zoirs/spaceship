@@ -33,8 +33,15 @@ public class Response {
         private Builder() {
         }
 
-        public void add(String key, ConfigurationValues values) {
+        public Builder add(String key, ConfigurationValues values) {
             Response.this.add(key, values);
+            return this;
+        }
+
+        public Builder add(String key, int set) {
+            ConfigurationValues values = new ConfigurationValues(set);
+            values.setActualValue();
+            return add(key, values);
         }
 
         public Response build() {

@@ -18,13 +18,13 @@ public class OperationExecuteCommand implements Runnable {
     private static final String PREFIX_MSG = "Execute operation.";
 
     private final List<Operation> operations;
-    private final TelemetryService telemetryService;
+    private final ITelemetryService telemetryService;
     private final MessageSender messageSender;
     private final ScheduledExecutorService executor;
     private final RestClientService restClientService;
 
 
-    public OperationExecuteCommand(TelemetryService telemetryService, List<Operation> operations, MessageSender messageSender, RestClientService restClientService) {
+    public OperationExecuteCommand(ITelemetryService telemetryService, List<Operation> operations, MessageSender messageSender, RestClientService restClientService) {
         this.telemetryService = telemetryService;
         this.operations = operations;
         this.messageSender = messageSender;

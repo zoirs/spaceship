@@ -1,4 +1,4 @@
-package ru.chernyshev.control.dto;
+package ru.chernyshev.control.program;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
@@ -10,13 +10,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
+import ru.chernyshev.control.dto.FlyProgram;
+import ru.chernyshev.control.dto.Operation;
 import ru.chernyshev.control.service.MessageSender;
 import ru.chernyshev.control.service.ProgramLoader;
 import ru.chernyshev.control.service.RestClientService;
 import ru.chernyshev.control.service.TelemetryService;
-import ru.chernyshev.ifaces.dto.Response;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;

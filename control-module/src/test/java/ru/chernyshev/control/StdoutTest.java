@@ -23,8 +23,8 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(classes = StdoutTest.StdoutTestConfiguration.class)
 @AutoConfigureMockMvc
 public class StdoutTest {
-    @Configuration
-    static class StdoutTestConfiguration {
+        @Configuration
+        static class StdoutTestConfiguration {
 
         @Bean
         public ObjectMapper objectMapper() {

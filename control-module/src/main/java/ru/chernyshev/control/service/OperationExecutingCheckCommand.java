@@ -1,5 +1,6 @@
 package ru.chernyshev.control.service;
 
+import org.springframework.util.CollectionUtils;
 import ru.chernyshev.control.dto.Operation;
 import ru.chernyshev.control.model.Log;
 import ru.chernyshev.ifaces.dto.ConfigurationValues;
@@ -15,12 +16,12 @@ public class OperationExecutingCheckCommand implements Runnable {
     private static final String PREFIX_MSG = "Check operation result.";
 
     private final RestClientService restClientService;
-    private final TelemetryService telemetryService;
+    private final ITelemetryService telemetryService;
     private final MessageSender messageSender;
 
     private final List<Operation> operations;
 
-    public OperationExecutingCheckCommand(RestClientService restClientService, TelemetryService telemetryService, List<Operation> operations, MessageSender messageSender) {
+    public OperationExecutingCheckCommand(RestClientService restClientService, ITelemetryService telemetryService, List<Operation> operations, MessageSender messageSender) {
         this.restClientService = restClientService;
         this.telemetryService = telemetryService;
         this.messageSender = messageSender;
@@ -68,28 +69,12 @@ public class OperationExecutingCheckCommand implements Runnable {
 
     private List<Operation> getNotExecutedOperation(Response response) {
 
-        if (response == null) {
+        if (response == null || CollectionUtils.isEmpty(response.getResponse())) {
             return operations;
         }
 
         List<Operation> notExecutedOperations = new ArrayList<>();
         Map<String, ConfigurationValues> configuration = response.getResponse();
-
-        for (String paramName : configuration.keySet()) {
-
-            Operation operation = operations.stream()
-                    .filter(o -> o.getVariable().equals(paramName))
-                    .findFirst()
-                    .orElse(null);
-
-            if (operation == null ){
-                continue;
-            }
-            ConfigurationValues values = configuration.get(paramName);
-            if (values.getValue() != operation.getValue()) {
-                notExecutedOperations.add(operation);
-            }
-        }
 
         for (Operation o : operations) {
             if (!configuration.containsKey(o.getVariable())) {
