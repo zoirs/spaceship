@@ -1,10 +1,10 @@
 package ru.chernyshev.control.service;
 
-import ru.chernyshev.control.model.Log;
+import ru.chernyshev.control.dto.LogMessage;
 
 public interface IMessageSender {
 
     void stderr(String message);
 
-    void stdout(Log log);
+    void stdout(LogMessage log);
 }

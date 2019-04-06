@@ -3,7 +3,8 @@ package ru.chernyshev.control.utils;
 import org.springframework.util.CollectionUtils;
 import ru.chernyshev.control.dto.FlyProgram;
 import ru.chernyshev.control.dto.Operation;
-import ru.chernyshev.control.service.ConfigurationParam;
+import ru.chernyshev.control.type.ConfigurationParam;
+import ru.chernyshev.control.type.ProgramErrorType;
 
 import java.util.*;
 import java.util.function.BiFunction;

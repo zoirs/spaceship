@@ -1,4 +1,4 @@
-package ru.chernyshev.control.service;
+package ru.chernyshev.control.type;
 
 public enum ExitCodes {
 

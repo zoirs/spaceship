@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.chernyshev.control.model.Log;
+import ru.chernyshev.control.dto.LogMessage;
 import ru.chernyshev.control.service.IMessageSender;
 import ru.chernyshev.control.service.MessageSender;
 
@@ -60,7 +60,7 @@ public class StdoutTest {
 
     @Test
     public void out() {
-        Log testMessage = Log.trace("test message");
+        LogMessage testMessage = LogMessage.trace("test message");
         messageSender.stdout(testMessage);
         assertTrue(outContent.toString().contains("test message"));
     }

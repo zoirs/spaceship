@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.chernyshev.control.model.Log;
+import ru.chernyshev.control.dto.LogMessage;
 
 @Service
 public class MessageSender implements IMessageSender {
@@ -20,11 +20,11 @@ public class MessageSender implements IMessageSender {
         System.err.println(message);
     }
 
-    public void stdout(Log log) {
+    public void stdout(LogMessage log) {
         System.out.println(convertToString(log));
     }
 
-    private String convertToString(Log log) {
+    private String convertToString(LogMessage log) {
         try {
             return objectMapper.writeValueAsString(log);
         } catch (JsonProcessingException ignore) {

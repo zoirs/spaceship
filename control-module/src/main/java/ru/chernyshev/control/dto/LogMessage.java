@@ -1,10 +1,10 @@
-package ru.chernyshev.control.model;
+package ru.chernyshev.control.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
-public class Log {
+public class LogMessage {
 
     private static final String TRACE = "trace";
     private static final String INFO = "info";
@@ -20,26 +20,26 @@ public class Log {
     @JsonProperty("message")
     private String message;
 
-    private Log(String level, String message) {
+    private LogMessage(String level, String message) {
         this.level = level;
         this.timestamp = (int) (new Date().getTime() / 1000);
         this.message = message;
     }
 
-    public static Log trace(String message) {
-        return new Log(TRACE, message);
+    public static LogMessage trace(String message) {
+        return new LogMessage(TRACE, message);
     }
 
-    public static Log info(String message) {
-        return new Log(INFO, message);
+    public static LogMessage info(String message) {
+        return new LogMessage(INFO, message);
     }
 
-    public static Log warn(String message) {
-        return new Log(WARN, message);
+    public static LogMessage warn(String message) {
+        return new LogMessage(WARN, message);
     }
 
-    public static Log error(String message) {
-        return new Log(ERROR, message);
+    public static LogMessage error(String message) {
+        return new LogMessage(ERROR, message);
     }
 
     @Override

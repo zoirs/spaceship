@@ -9,7 +9,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.chernyshev.control.dto.FlyProgram;
 import ru.chernyshev.control.dto.Operation;
 import ru.chernyshev.control.utils.OperationValidator;
-import ru.chernyshev.control.utils.ProgramErrorType;
+import ru.chernyshev.control.type.ProgramErrorType;
 
 import java.util.ArrayList;
 import java.util.List;

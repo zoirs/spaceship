@@ -7,9 +7,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import ru.chernyshev.control.dto.FlyProgram;
 import ru.chernyshev.control.dto.Operation;
-import ru.chernyshev.control.model.Log;
+import ru.chernyshev.control.type.ExitCodes;
+import ru.chernyshev.control.dto.LogMessage;
+import ru.chernyshev.control.type.TelemetryType;
+import ru.chernyshev.control.service.tasks.OperationExecuteCommand;
 import ru.chernyshev.control.utils.OperationValidator;
-import ru.chernyshev.control.utils.ProgramErrorType;
+import ru.chernyshev.control.type.ProgramErrorType;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +59,7 @@ public class ProgramLoader implements IProgramLoader {
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-        messageSender.stdout(Log.trace(PREFIX_MSG + "Start read"));
+        messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Start read"));
 
         File fileProgram = new File(flightProgramPath);
         if (!fileProgram.exists() || !fileProgram.isFile()) {
@@ -82,12 +85,12 @@ public class ProgramLoader implements IProgramLoader {
             System.exit(ExitCodes.WRONG_PROGRAM.getExitCode());
         }
 
-        messageSender.stdout(Log.trace(PREFIX_MSG + "Finish read program"));
+        messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Finish read program"));
 
         telemetryService.start();
         flyProgram.setStartUp((int) (new Date().getTime() / 1000)); // todo убрать, это для теста
         execute(flyProgram);
-        messageSender.stdout(Log.trace(PREFIX_MSG + "Finish read"));
+        messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Finish read"));
     }
 
     public FlyProgram getFlyProgram() {
@@ -95,7 +98,7 @@ public class ProgramLoader implements IProgramLoader {
     }
 
     public void execute(FlyProgram flyProgram) {
-        messageSender.stdout(Log.trace(PREFIX_MSG + "Start execute"));
+        messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Start execute"));
 
         Date startupDate = Date.from(Instant.ofEpochSecond(flyProgram.getStartUp()));
 
@@ -110,7 +113,7 @@ public class ProgramLoader implements IProgramLoader {
                     new OperationExecuteCommand(telemetryService, entry.getValue(), messageSender, restClientService)
                     , delay, TimeUnit.MILLISECONDS);
         }
-        messageSender.stdout(Log.trace(PREFIX_MSG + "Execute was schedule"));
+        messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Execute was schedule"));
     }
 
     private long getDelay(Date startupDate, Integer delayAfterStartup) {

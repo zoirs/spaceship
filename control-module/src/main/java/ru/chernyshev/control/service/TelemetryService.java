@@ -5,7 +5,9 @@ import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.chernyshev.control.dto.TelemetryDto;
-import ru.chernyshev.control.model.Log;
+import ru.chernyshev.control.type.ConfigurationParam;
+import ru.chernyshev.control.dto.LogMessage;
+import ru.chernyshev.control.type.TelemetryType;
 import ru.chernyshev.ifaces.dto.Response;
 
 import java.util.List;
@@ -32,7 +34,7 @@ public class TelemetryService implements ITelemetryService {
     }
 
     public void start() {
-        messageSender.stdout(Log.trace("Telemetry send start"));
+        messageSender.stdout(LogMessage.trace("Telemetry send start"));
         scheduler.scheduleAtFixedRate(this::sendTelemetry, telemetryFreq, telemetryFreq, TimeUnit.SECONDS);
     }
 

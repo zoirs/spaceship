@@ -1,4 +1,4 @@
-package ru.chernyshev.control.utils;
+package ru.chernyshev.control.type;
 
 public enum ProgramErrorType {
     DUBLICATE,

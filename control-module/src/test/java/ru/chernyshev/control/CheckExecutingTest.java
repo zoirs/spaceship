@@ -13,7 +13,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.chernyshev.control.dto.Operation;
+import ru.chernyshev.control.type.TelemetryType;
 import ru.chernyshev.control.service.*;
+import ru.chernyshev.control.service.tasks.OperationExecutingCheckCommand;
 import ru.chernyshev.ifaces.dto.Response;
 
 import java.io.EOFException;

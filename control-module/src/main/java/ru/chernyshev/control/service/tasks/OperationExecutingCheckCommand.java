@@ -1,8 +1,13 @@
-package ru.chernyshev.control.service;
+package ru.chernyshev.control.service.tasks;
 
 import org.springframework.util.CollectionUtils;
 import ru.chernyshev.control.dto.Operation;
-import ru.chernyshev.control.model.Log;
+import ru.chernyshev.control.dto.LogMessage;
+import ru.chernyshev.control.service.IMessageSender;
+import ru.chernyshev.control.service.IRestClientService;
+import ru.chernyshev.control.service.ITelemetryService;
+import ru.chernyshev.control.type.TelemetryType;
+import ru.chernyshev.control.utils.ErrorWrapper;
 import ru.chernyshev.ifaces.dto.ConfigurationValues;
 import ru.chernyshev.ifaces.dto.Response;
 
@@ -30,22 +35,22 @@ public class OperationExecutingCheckCommand implements Runnable {
 
     @Override
     public void run() {
-        messageSender.stdout(Log.trace(PREFIX_MSG + "Start"));
+        messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Start"));
 
         String checkedOperations = operations.stream().map(Operation::getVariable)
                 .collect(Collectors.joining(","));
 
-        messageSender.stdout(Log.info(PREFIX_MSG + "Params: " + checkedOperations));
+        messageSender.stdout(LogMessage.info(PREFIX_MSG + "Params: " + checkedOperations));
 
         Response response = null;
-        Error apiError = null;
+        ErrorWrapper apiError = null;
 
         try {
             response = restClientService.get(checkedOperations);
         } catch (Exception e) {
-            apiError = Error.createApiError(operations, e);
+            apiError = ErrorWrapper.createApiError(operations, e);
         }
-        messageSender.stdout(Log.trace(PREFIX_MSG + " Get response: " + (response != null ? response.getResponse() : null)));
+        messageSender.stdout(LogMessage.trace(PREFIX_MSG + " Get response: " + (response != null ? response.getResponse() : null)));
 
         if (apiError != null) {
             telemetryService.send(TelemetryType.ERROR, PREFIX_MSG + apiError.getMessage());
@@ -58,13 +63,13 @@ public class OperationExecutingCheckCommand implements Runnable {
         List<Operation> notExecutedOperation = getNotExecutedOperation(response);
 
         if (!notExecutedOperation.isEmpty()) {
-            Error operationError = Error.createOperationError(notExecutedOperation);
+            ErrorWrapper operationError = ErrorWrapper.createOperationError(notExecutedOperation);
             telemetryService.send(TelemetryType.ERROR, PREFIX_MSG + operationError.getMessage());
             if (operationError.isCritical()) {
                 System.exit(operationError.getExitCode());
             }
         }
-        messageSender.stdout(Log.trace(PREFIX_MSG + "Complete for ids: " + getCurrentOperations()));
+        messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Complete for ids: " + getCurrentOperations()));
     }
 
     private List<Operation> getNotExecutedOperation(Response response) {

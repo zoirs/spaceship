@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.chernyshev.control.dto.Operation;
 import ru.chernyshev.control.service.*;
+import ru.chernyshev.control.service.tasks.OperationExecuteCommand;
 import ru.chernyshev.ifaces.dto.Response;
 
 import java.util.ArrayList;

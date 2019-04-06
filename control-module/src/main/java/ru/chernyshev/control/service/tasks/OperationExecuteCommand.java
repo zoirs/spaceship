@@ -1,7 +1,12 @@
-package ru.chernyshev.control.service;
+package ru.chernyshev.control.service.tasks;
 
 import ru.chernyshev.control.dto.Operation;
-import ru.chernyshev.control.model.Log;
+import ru.chernyshev.control.dto.LogMessage;
+import ru.chernyshev.control.service.IMessageSender;
+import ru.chernyshev.control.service.IRestClientService;
+import ru.chernyshev.control.service.ITelemetryService;
+import ru.chernyshev.control.type.TelemetryType;
+import ru.chernyshev.control.utils.ErrorWrapper;
 import ru.chernyshev.ifaces.dto.Response;
 
 import java.util.List;
@@ -35,20 +40,20 @@ public class OperationExecuteCommand implements Runnable {
 
     @Override
     public void run() {
-        messageSender.stdout(Log.trace(PREFIX_MSG + " Start: " + getCurrentOperations()));
+        messageSender.stdout(LogMessage.trace(PREFIX_MSG + " Start: " + getCurrentOperations()));
 
         Map<String, Integer> requestParam = operations.stream()
                 .collect(Collectors.toMap(Operation::getVariable, Operation::getValue));
 
-        messageSender.stdout(Log.info(PREFIX_MSG + " Params: " + requestParam));
+        messageSender.stdout(LogMessage.info(PREFIX_MSG + " Params: " + requestParam));
 
         Response response = null;
-        Error apiError = null;
+        ErrorWrapper apiError = null;
 
         try {
             response = restClientService.send(requestParam);
         } catch (Exception e) {
-            apiError = Error.createApiError(operations, e);
+            apiError = ErrorWrapper.createApiError(operations, e);
         }
 
         if (apiError != null) {
@@ -58,7 +63,7 @@ public class OperationExecuteCommand implements Runnable {
             }
         }
 
-        messageSender.stdout(Log.trace(PREFIX_MSG + " Get response: " + (response != null ? response.getResponse() : "")));
+        messageSender.stdout(LogMessage.trace(PREFIX_MSG + " Get response: " + (response != null ? response.getResponse() : "")));
 
         Map<Integer, List<Operation>> operationsByTimeout = operations
                 .stream()
@@ -72,7 +77,7 @@ public class OperationExecuteCommand implements Runnable {
                     , timeout, TimeUnit.MILLISECONDS);
         }
 
-        messageSender.stdout(Log.trace(PREFIX_MSG + "Complete for ids: " + getCurrentOperations()));
+        messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Complete for ids: " + getCurrentOperations()));
     }
 
     private String getCurrentOperations() {

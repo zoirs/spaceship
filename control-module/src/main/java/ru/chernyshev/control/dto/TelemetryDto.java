@@ -3,7 +3,7 @@ package ru.chernyshev.control.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ru.chernyshev.control.service.TelemetryType;
+import ru.chernyshev.control.type.TelemetryType;
 
 import java.util.Date;
 

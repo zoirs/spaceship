@@ -1,4 +1,4 @@
-package ru.chernyshev.control.service;
+package ru.chernyshev.control.type;
 
 import org.apache.logging.log4j.util.Strings;
 
@@ -56,10 +56,7 @@ public enum ConfigurationParam {
         if (param.min > value){
             return false;
         }
-        if (param.max < value){
-            return false;
-        }
-        return true;
+        return param.max >= value;
     }
 
     public static boolean isExist(String key) {
