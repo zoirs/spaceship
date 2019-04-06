@@ -15,6 +15,7 @@ public class FlyProgram {
 
     @JsonProperty("startUp")
     private Integer startUp;
+
     @JsonProperty("operations")
     private List<Operation> operations = null;
 

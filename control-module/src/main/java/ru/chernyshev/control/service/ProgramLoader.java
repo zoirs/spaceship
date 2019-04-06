@@ -94,7 +94,7 @@ public class ProgramLoader {
         return flyProgram;
     }
 
-    private void execute(FlyProgram flyProgram) {
+    public void execute(FlyProgram flyProgram) {
         messageSender.stdout(Log.trace(PREFIX_MSG + "Start execute"));
 
         Date startupDate = Date.from(Instant.ofEpochSecond(flyProgram.getStartUp()));

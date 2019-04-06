@@ -20,23 +20,24 @@ import ru.chernyshev.control.service.TelemetryService;
 import ru.chernyshev.ifaces.dto.Response;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ProgramExecuteTest.ProgramLoaderTestConfiguration.class)
+@SpringBootTest(classes = ProgramExecuteTest.ProgramLoadAndExecuteConfiguration.class)
 @AutoConfigureMockMvc
 public class ProgramExecuteTest {
 
     @Configuration
-    static class ProgramLoaderTestConfiguration {
+    static class ProgramLoadAndExecuteConfiguration {
 
         @MockBean
         private RestClientService restClientService;
@@ -55,31 +56,109 @@ public class ProgramExecuteTest {
 
         @Bean
         public ProgramLoader programLoader(MessageSender messageSender, ObjectMapper objectMapper) throws UnsupportedEncodingException {
-            URL resource = this.getClass().getResource("/programmMoreOperation.json");
-            String path = URLDecoder.decode(resource.getFile(), "UTF-8");
+            return new ProgramLoaderTest(restClientService, telemetryService, messageSender, objectMapper, "");
+        }
 
-            return new ProgramLoader(restClientService, telemetryService, messageSender, objectMapper, path);
+        static class ProgramLoaderTest extends ProgramLoader {
+            ProgramLoaderTest(RestClientService restClientService, TelemetryService telemetryService, MessageSender messageSender, ObjectMapper objectMapper, String flightProgramPath) {
+                super(restClientService, telemetryService, messageSender, objectMapper, flightProgramPath);
+            }
+
+            @Override
+            public void init() {
+                //do nothing
+            }
         }
     }
 
     @Autowired
+    private ProgramLoader programLoader;
+    @Autowired
     private RestClientService restClientService;
 
+    /**
+     * Тест на запуск трех операций одной командой
+     */
     @Test
-    public void loadOnStartTest() throws JsonProcessingException {
-        final CountDownLatch latch = new CountDownLatch(2);
+    public void threeOperationAtOneTime() throws JsonProcessingException {
+        final CountDownLatch latch = new CountDownLatch(1);
+        AtomicInteger countCommand = new AtomicInteger();
+
+        FlyProgram flyProgram = mock(FlyProgram.class);
+        when(flyProgram.getStartUp()).thenReturn((int) (new Date().getTime() / 1000));
+        List<Operation> operations = new ArrayList<>();
+
+        operations.add(createOperation(1, "param1"));
+        operations.add(createOperation(2, "param2"));
+        operations.add(createOperation(3, "param3"));
+
+        when(flyProgram.getOperations()).thenReturn(operations);
+
+        programLoader.execute(flyProgram);
 
         doAnswer((Answer<Response>) invocation -> {
                     latch.countDown();
+                    countCommand.getAndIncrement();
                     return mock(Response.class);
                 }
         ).when(restClientService).send(Mockito.anyMap());
 
         try {
-            boolean await = latch.await(3L, TimeUnit.SECONDS);
+            boolean await = latch.await(1L, TimeUnit.SECONDS);
             assertTrue(await);
         } catch (InterruptedException e) {
             fail();
         }
+        assertThat(countCommand.intValue(), is(1));
+    }
+
+    /**
+     * Тест на запуск трех операций тремя командами
+     */
+    @Test
+    public void threeOperationAtDifferentTime() throws JsonProcessingException {
+        final CountDownLatch latch = new CountDownLatch(3);
+        AtomicInteger countCommand = new AtomicInteger();
+
+        FlyProgram flyProgram = mock(FlyProgram.class);
+        when(flyProgram.getStartUp()).thenReturn((int) (new Date().getTime() / 1000));
+        List<Operation> operations = new ArrayList<>();
+
+        operations.add(createOperation(1, "param1", 1));
+        operations.add(createOperation(2, "param2", 2));
+        operations.add(createOperation(3, "param3", 3));
+
+        when(flyProgram.getOperations()).thenReturn(operations);
+
+        programLoader.execute(flyProgram);
+
+        doAnswer((Answer<Response>) invocation -> {
+                    latch.countDown();
+                    countCommand.getAndIncrement();
+                    return mock(Response.class);
+                }
+        ).when(restClientService).send(Mockito.anyMap());
+
+        try {
+            boolean await = latch.await(5L, TimeUnit.SECONDS);
+            assertTrue(await);
+        } catch (InterruptedException e) {
+            fail();
+        }
+        assertThat(countCommand.intValue(), is(3));
+    }
+
+    private Operation createOperation(int id, String paramName) {
+        return createOperation(id, paramName, 0);
+    }
+
+    private Operation createOperation(int id, String paramName, int deltaT) {
+        Operation operation = mock(Operation.class);
+        when(operation.getId()).thenReturn(id);
+        when(operation.getDeltaT()).thenReturn(deltaT);
+        when(operation.getTimeout()).thenReturn(1);
+        when(operation.getVariable()).thenReturn(paramName);
+        when(operation.getValue()).thenReturn(10);
+        return operation;
     }
 }
