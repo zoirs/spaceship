@@ -14,6 +14,7 @@ import ru.chernyshev.ifaces.dto.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class OperationExecutingCheckCommand implements Runnable {
@@ -72,7 +73,8 @@ public class OperationExecutingCheckCommand implements Runnable {
             }
         }
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Complete for ids: " + getCurrentOperations()));
-        checkedCallback.run();
+
+        Optional.ofNullable(checkedCallback).ifPresent(Runnable::run);
     }
 
     private List<Operation> getNotExecutedOperation(Response response) {

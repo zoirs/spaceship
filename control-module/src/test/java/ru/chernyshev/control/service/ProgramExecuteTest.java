@@ -1,4 +1,4 @@
-package ru.chernyshev.control.program;
+package ru.chernyshev.control.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,8 +15,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.chernyshev.control.dto.FlyProgram;
 import ru.chernyshev.control.dto.Operation;
-import ru.chernyshev.control.service.*;
-import ru.chernyshev.control.utils.MockProgram;
 import ru.chernyshev.ifaces.dto.Response;
 
 import java.io.UnsupportedEncodingException;
@@ -61,7 +59,7 @@ public class ProgramExecuteTest {
             return new ProgramLoaderTest(restClientService, telemetryService, messageSender, objectMapper, "");
         }
 
-        static class ProgramLoaderTest extends ProgramLoader {
+        static class ProgramLoaderTest extends ProgramLoaderImpl {
             ProgramLoaderTest(IRestClientService restClientService, ITelemetryService telemetryService, IMessageSender messageSender, ObjectMapper objectMapper, String flightProgramPath) {
                 super(restClientService, telemetryService, messageSender, objectMapper, flightProgramPath);
             }
@@ -128,8 +126,6 @@ public class ProgramExecuteTest {
 
         when(flyProgram.getOperations()).thenReturn(operations);
 
-        programLoader.execute(flyProgram);
-
         doAnswer((Answer<Response>) invocation -> {
                     latch.countDown();
                     countCommand.getAndIncrement();
@@ -137,12 +133,15 @@ public class ProgramExecuteTest {
                 }
         ).when(restClientService).send(Mockito.anyMap());
 
+        programLoader.execute(flyProgram);
+
         try {
             boolean await = latch.await(5L, TimeUnit.SECONDS);
             assertTrue(await);
         } catch (InterruptedException e) {
             fail();
         }
+
         assertThat(countCommand.intValue(), is(3));
     }
 }

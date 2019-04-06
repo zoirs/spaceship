@@ -1,4 +1,4 @@
-package ru.chernyshev.control.program;
+package ru.chernyshev.control.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +13,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.chernyshev.control.service.*;
 import ru.chernyshev.ifaces.dto.Response;
 
 import java.io.UnsupportedEncodingException;
@@ -55,7 +54,7 @@ public class ProgramLoadAndExecuteTest {
             URL resource = this.getClass().getResource("/programmMoreOperation.json");
             String path = URLDecoder.decode(resource.getFile(), "UTF-8");
 
-            return new ProgramLoader(restClientService, telemetryService, messageSender, objectMapper, path);
+            return new ProgramLoaderImpl(restClientService, telemetryService, messageSender, objectMapper, path);
         }
     }
 

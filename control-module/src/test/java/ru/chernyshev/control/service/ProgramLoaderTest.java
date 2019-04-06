@@ -1,4 +1,4 @@
-package ru.chernyshev.control.program;
+package ru.chernyshev.control.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
@@ -12,7 +12,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 import ru.chernyshev.control.dto.FlyProgram;
 import ru.chernyshev.control.dto.Operation;
-import ru.chernyshev.control.service.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -56,7 +55,7 @@ public class ProgramLoaderTest {
         public IProgramLoader programLoader(RestClientService restrestClientService, MessageSender messageSender, ObjectMapper objectMapper) throws UnsupportedEncodingException {
             URL resource = this.getClass().getResource("/programmOneOperation.json");
             String path = URLDecoder.decode(resource.getFile(), "UTF-8");
-            return new ProgramLoader(restrestClientService, mock(TelemetryService.class), messageSender, objectMapper, path);
+            return new ProgramLoaderImpl(restrestClientService, mock(TelemetryService.class), messageSender, objectMapper, path);
         }
     }
 

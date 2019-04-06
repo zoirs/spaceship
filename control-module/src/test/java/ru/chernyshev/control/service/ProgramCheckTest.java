@@ -1,4 +1,4 @@
-package ru.chernyshev.control.program;
+package ru.chernyshev.control.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.chernyshev.control.dto.Operation;
-import ru.chernyshev.control.service.*;
 import ru.chernyshev.control.service.tasks.OperationExecuteCommand;
 import ru.chernyshev.ifaces.dto.Response;
 
@@ -117,7 +116,7 @@ public class ProgramCheckTest {
         new OperationExecuteCommand(telemetryService, operations, messageSender, restClientService, null).run();
 
         try {
-            boolean await = latch.await(1L, TimeUnit.SECONDS);
+            boolean await = latch.await(4L, TimeUnit.SECONDS);
             assertTrue(await);
         } catch (InterruptedException e) {
             fail();

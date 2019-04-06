@@ -116,16 +116,18 @@ public class ProgramLoader implements IProgramLoader {
             executor.schedule(command, delay, TimeUnit.MILLISECONDS);
         }
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Execute was schedule"));
-        commandCounter = new CountDownLatch(operationsByDelays.entrySet().size());
 
-        new Thread(() -> {
-            try {
-                commandCounter.await();
-            } catch (InterruptedException ignore) {
-            }
-            messageSender.stdout(LogMessage.trace("Last command checked. Program exit"));
-            System.exit(ExitCodes.SUCCESS.getExitCode());
-        }).start();
+        waitExecution(operationsByDelays.entrySet().size());
+    }
+
+    void waitExecution(int commandCount) {
+        commandCounter = new CountDownLatch(commandCount);
+        try {
+            commandCounter.await();
+        } catch (InterruptedException ignore) {
+        }
+        messageSender.stdout(LogMessage.trace("Last command checked. Program exit"));
+        System.exit(ExitCodes.SUCCESS.getExitCode());
     }
 
     private long getDelay(Date startupDate, Integer delayAfterStartup) {
