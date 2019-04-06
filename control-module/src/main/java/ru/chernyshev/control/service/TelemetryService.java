@@ -35,6 +35,7 @@ public class TelemetryService implements ITelemetryService {
 
     public void start() {
         messageSender.stdout(LogMessage.trace("Telemetry send start"));
+        new Thread(this::sendTelemetry).start();
         scheduler.scheduleAtFixedRate(this::sendTelemetry, telemetryFreq, telemetryFreq, TimeUnit.SECONDS);
     }
 

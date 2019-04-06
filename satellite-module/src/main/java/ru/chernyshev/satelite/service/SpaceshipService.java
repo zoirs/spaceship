@@ -39,7 +39,7 @@ public class SpaceshipService {
             }
             ConfigurationValues param = configuration.get(key);
             param.setActualValue();
-            configuration.putIfAbsent(key, param);
+            configuration.put(key, param);
         }).start();
     }
 }

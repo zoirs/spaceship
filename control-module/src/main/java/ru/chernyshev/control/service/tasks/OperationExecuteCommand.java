@@ -74,7 +74,7 @@ public class OperationExecuteCommand implements Runnable {
 
             executor.schedule(
                     new OperationExecutingCheckCommand(restClientService, telemetryService, entry.getValue(), messageSender)
-                    , timeout, TimeUnit.MILLISECONDS);
+                    , timeout, TimeUnit.SECONDS);
         }
 
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Complete for ids: " + getCurrentOperations()));
