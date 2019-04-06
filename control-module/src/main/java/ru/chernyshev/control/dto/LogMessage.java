@@ -4,6 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
+/**
+ * Обертка для сообщений лога
+ *
+ * Формат:
+ * {
+ *   "time":"1961-04-12T06:07:00Z",
+ *   "level":"info",
+ *   "message":"Let's go!"
+ * }
+ **/
 public class LogMessage {
 
     private static final String TRACE = "trace";

@@ -26,14 +26,16 @@ public class OperationExecuteCommand implements Runnable {
     private final ITelemetryService telemetryService;
     private final IMessageSender messageSender;
     private final IRestClientService restClientService;
+    private final Runnable checkedCallback;
 
     private final ScheduledExecutorService executor;
 
-    public OperationExecuteCommand(ITelemetryService telemetryService, List<Operation> operations, IMessageSender messageSender, IRestClientService restClientService) {
+    public OperationExecuteCommand(ITelemetryService telemetryService, List<Operation> operations, IMessageSender messageSender, IRestClientService restClientService, Runnable checkedCallback) {
         this.telemetryService = telemetryService;
         this.operations = operations;
         this.messageSender = messageSender;
         this.restClientService = restClientService;
+        this.checkedCallback = checkedCallback;
 
         this.executor = Executors.newScheduledThreadPool(5);
     }
@@ -72,9 +74,8 @@ public class OperationExecuteCommand implements Runnable {
         for (Map.Entry<Integer, List<Operation>> entry : operationsByTimeout.entrySet()) {
             Integer timeout = entry.getKey();
 
-            executor.schedule(
-                    new OperationExecutingCheckCommand(restClientService, telemetryService, entry.getValue(), messageSender)
-                    , timeout, TimeUnit.SECONDS);
+            OperationExecutingCheckCommand checkCommand = new OperationExecutingCheckCommand(restClientService, telemetryService, entry.getValue(), messageSender, checkedCallback);
+            executor.schedule(checkCommand, timeout, TimeUnit.SECONDS);
         }
 
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Complete for ids: " + getCurrentOperations()));

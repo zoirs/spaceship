@@ -23,14 +23,16 @@ public class OperationExecutingCheckCommand implements Runnable {
     private final IRestClientService restClientService;
     private final ITelemetryService telemetryService;
     private final IMessageSender messageSender;
+    private final Runnable checkedCallback;
 
     private final List<Operation> operations;
 
-    public OperationExecutingCheckCommand(IRestClientService restClientService, ITelemetryService telemetryService, List<Operation> operations, IMessageSender messageSender) {
+    public OperationExecutingCheckCommand(IRestClientService restClientService, ITelemetryService telemetryService, List<Operation> operations, IMessageSender messageSender, Runnable checkedCallback) {
         this.restClientService = restClientService;
         this.telemetryService = telemetryService;
         this.messageSender = messageSender;
         this.operations = operations;
+        this.checkedCallback = checkedCallback;
     }
 
     @Override
@@ -70,6 +72,7 @@ public class OperationExecutingCheckCommand implements Runnable {
             }
         }
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Complete for ids: " + getCurrentOperations()));
+        checkedCallback.run();
     }
 
     private List<Operation> getNotExecutedOperation(Response response) {

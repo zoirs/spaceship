@@ -81,7 +81,7 @@ public class ProgramCheckTest {
                 }
         ).when(restClientService).get(Mockito.anyString());
 
-        new OperationExecuteCommand(telemetryService, operations, messageSender, restClientService).run();
+        new OperationExecuteCommand(telemetryService, operations, messageSender, restClientService, null).run();
 
         try {
             boolean await = latch.await(1L, TimeUnit.SECONDS);
@@ -114,7 +114,7 @@ public class ProgramCheckTest {
                 }
         ).when(restClientService).get(Mockito.anyString());
 
-        new OperationExecuteCommand(telemetryService, operations, messageSender, restClientService).run();
+        new OperationExecuteCommand(telemetryService, operations, messageSender, restClientService, null).run();
 
         try {
             boolean await = latch.await(1L, TimeUnit.SECONDS);

@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +32,8 @@ import static java.util.stream.Collectors.groupingBy;
 public class ProgramLoader implements IProgramLoader {
 
     private static final String PREFIX_MSG = "Program load. ";
+
+    private CountDownLatch commandCounter;
 
     private final IMessageSender messageSender;
     private final IRestClientService restClientService;
@@ -109,14 +112,27 @@ public class ProgramLoader implements IProgramLoader {
         for (Map.Entry<Integer, List<Operation>> entry : operationsByDelays.entrySet()) {
             long delay = getDelay(startupDate, entry.getKey());
 
-            executor.schedule(
-                    new OperationExecuteCommand(telemetryService, entry.getValue(), messageSender, restClientService)
-                    , delay, TimeUnit.MILLISECONDS);
+            OperationExecuteCommand command = new OperationExecuteCommand(telemetryService, entry.getValue(), messageSender, restClientService, checkedCallback());
+            executor.schedule(command, delay, TimeUnit.MILLISECONDS);
         }
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Execute was schedule"));
+        commandCounter = new CountDownLatch(operationsByDelays.entrySet().size());
+
+        new Thread(() -> {
+            try {
+                commandCounter.await();
+            } catch (InterruptedException ignore) {
+            }
+            messageSender.stdout(LogMessage.trace("Last command checked. Program exit"));
+            System.exit(ExitCodes.SUCCESS.getExitCode());
+        }).start();
     }
 
     private long getDelay(Date startupDate, Integer delayAfterStartup) {
         return new Date().getTime() - startupDate.getTime() + delayAfterStartup * 1000;
+    }
+
+    private Runnable checkedCallback() {
+        return () -> commandCounter.countDown();
     }
 }

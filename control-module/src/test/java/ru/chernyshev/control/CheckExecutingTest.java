@@ -77,7 +77,7 @@ public class CheckExecutingTest {
                 .when(restClientService)
                 .get(paramName);
 
-        new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender).run();
+        new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender, null).run();
 
         latch.await(1L, TimeUnit.SECONDS);
         verify(telemetryService, never()).send(any(), anyString());
@@ -98,7 +98,7 @@ public class CheckExecutingTest {
                 .when(restClientService)
                 .get(paramName);
 
-        new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender).run();
+        new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender, null).run();
 
         latch.await(1L, TimeUnit.SECONDS);
         verify(telemetryService, times(1))
@@ -120,7 +120,7 @@ public class CheckExecutingTest {
                 .when(restClientService)
                 .get(paramName);
 
-        new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender).run();
+        new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender, null).run();
 
         latch.await(1L, TimeUnit.SECONDS);
         verify(telemetryService, times(1))
@@ -149,7 +149,7 @@ public class CheckExecutingTest {
                 .when(restClientService)
                 .get(paramName1 + "," + paramName2);
 
-        new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender).run();
+        new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender, null).run();
 
         latch.await(1L, TimeUnit.SECONDS);
         verify(telemetryService, times(1)).
@@ -176,7 +176,7 @@ public class CheckExecutingTest {
                 .when(restClientService)
                 .get(paramName);
 
-        new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender).run();
+        new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender, null).run();
 
         latch.await(1L, TimeUnit.SECONDS);
     }

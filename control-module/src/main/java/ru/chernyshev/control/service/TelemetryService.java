@@ -51,7 +51,14 @@ public class TelemetryService implements ITelemetryService {
                 .map(ConfigurationParam::getKey)
                 .collect(Collectors.joining(","));
 
-        Response response = restClientService.get(params);
+        Response response;
+
+        try {
+            response = restClientService.get(params);
+        } catch (Exception e){
+            messageSender.stdout(LogMessage.warn("Cant get telemetry " + e.toString()));
+            return;
+        }
 
         List<BasicNameValuePair> telemetryParams = response.getResponse().entrySet().stream()
                 .map(p -> new BasicNameValuePair(p.getKey(), String.valueOf(p.getValue() == null ? "null" : p.getValue().getValue())))
