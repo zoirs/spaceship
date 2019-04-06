@@ -57,7 +57,7 @@ public class ProgramLoaderTest {
 
         @Bean
         public ProgramLoader programLoader(RestClientService restrestClientService, MessageSender messageSender, ObjectMapper objectMapper) throws UnsupportedEncodingException {
-            URL resource = this.getClass().getResource("/programm.json");
+            URL resource = this.getClass().getResource("/programmOneOperation.json");
             String path = URLDecoder.decode(resource.getFile(), "UTF-8");
             return new ProgramLoader(restrestClientService, mock(TelemetryService.class), messageSender, objectMapper, path);
         }
@@ -87,13 +87,5 @@ public class ProgramLoaderTest {
         assertThat(operation.getVariable(), is("coolingSystemPowerPct"));
         assertThat(operation.getValue(), is(30));
         assertThat(operation.getTimeout(), is(1));
-    }
-
-    @Test
-    public void responseParseTest() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = "{\"coolingSystemPowerPct\":{\"set\":30,\"value\":11}}";
-        Response response = objectMapper.readValue(json, Response.class);
-        assertThat(response.getResponse().size(), is(1));
     }
 }

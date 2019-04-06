@@ -1,0 +1,26 @@
+{
+  "startUp": 1555016400,
+  "operations": [
+    {
+      "id": 1,
+      "deltaT": 0,
+      "variable": "coolingSystemPowerPct",
+      "value": 30,
+      "timeout": 1
+    },
+    {
+      "id": 2,
+      "deltaT": 1,
+      "variable": "orientationZenithAngleDeg",
+      "value": 30,
+      "timeout": 1
+    },
+    {
+      "id": 3,
+      "deltaT": 1,
+      "variable": "orientationAzimuthAngleDeg",
+      "value": 30,
+      "timeout": 1
+    }
+  ]
+}

@@ -1,18 +1,16 @@
 package ru.chernyshev.control.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import ru.chernyshev.control.dto.FlyProgram;
-import ru.chernyshev.control.model.Log;
 import ru.chernyshev.control.dto.Operation;
+import ru.chernyshev.control.model.Log;
 import ru.chernyshev.control.utils.OperationValidator;
+import ru.chernyshev.control.utils.ProgramErrorType;
 
-import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
@@ -25,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class ProgramLoader {
@@ -74,20 +71,14 @@ public class ProgramLoader {
             System.exit(ExitCodes.WRONG_PROGRAM.getExitCode());
         }
 
-        if (flyProgram == null) {
-            telemetryService.send(TelemetryType.ERROR, PREFIX_MSG + "Program is empty");
-            System.exit(ExitCodes.WRONG_PROGRAM.getExitCode());
-        }
+        Map<ProgramErrorType, List<Operation>> wrongOperation = OperationValidator.findWrongOperation(flyProgram);
 
-        List<Operation> wrongOperations = flyProgram.getOperations()
-                .stream()
-                .filter(o -> !OperationValidator.isValid(o))
-                .collect(toList());
-
-        if (!CollectionUtils.isEmpty(wrongOperations)) {
-            String wrongOperationIds = wrongOperations.stream().map(Operation::toString)
-                    .collect(Collectors.joining(", "));
-            telemetryService.send(TelemetryType.ERROR, PREFIX_MSG + "Program has wrong param " + wrongOperationIds);
+        if (wrongOperation.size() > 0) {
+            for (ProgramErrorType error : wrongOperation.keySet()) {
+                String wrongOperationIds = wrongOperation.get(error).stream().map(Operation::toString)
+                        .collect(Collectors.joining(", "));
+                telemetryService.send(TelemetryType.ERROR, PREFIX_MSG + error + wrongOperationIds);
+            }
             System.exit(ExitCodes.WRONG_PROGRAM.getExitCode());
         }
 
@@ -103,7 +94,7 @@ public class ProgramLoader {
         return flyProgram;
     }
 
-    private void execute(@Valid FlyProgram flyProgram) {
+    private void execute(FlyProgram flyProgram) {
         messageSender.stdout(Log.trace(PREFIX_MSG + "Start execute"));
 
         Date startupDate = Date.from(Instant.ofEpochSecond(flyProgram.getStartUp()));
