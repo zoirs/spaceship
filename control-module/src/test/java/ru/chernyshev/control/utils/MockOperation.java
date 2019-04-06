@@ -1,4 +1,4 @@
-package ru.chernyshev.control.mockObject;
+package ru.chernyshev.control.utils;
 
 import ru.chernyshev.control.dto.Operation;
 
@@ -12,17 +12,21 @@ public class MockOperation {
     }
 
     public static Operation createOperation(int id, String paramName, boolean isCritical) {
-        return getOperation(id, paramName, 0, isCritical);
+        return getOperation(id, paramName, 0, isCritical, 0);
     }
 
     public static Operation createOperation(int id, String paramName, int timeout) {
-        return getOperation(id, paramName, timeout, false);
+        return getOperation(id, paramName, timeout, false, 0);
     }
 
-    private static Operation getOperation(int id, String paramName, int timeout, boolean isCritical) {
+    public static Operation createOperation(int id, String paramName, int timeout, int deltaT) {
+        return getOperation(id, paramName, timeout, false, deltaT);
+    }
+
+    private static Operation getOperation(int id, String paramName, int timeout, boolean isCritical, int deltaT) {
         Operation operation = mock(Operation.class);
         when(operation.getId()).thenReturn(id);
-        when(operation.getDeltaT()).thenReturn(0);
+        when(operation.getDeltaT()).thenReturn(deltaT);
         when(operation.getTimeout()).thenReturn(timeout);
         when(operation.getVariable()).thenReturn(paramName);
         when(operation.getValue()).thenReturn(10);

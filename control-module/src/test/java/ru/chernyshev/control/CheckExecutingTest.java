@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.chernyshev.control.dto.Operation;
-import ru.chernyshev.control.mockObject.MockTelemetryService;
 import ru.chernyshev.control.service.*;
 import ru.chernyshev.ifaces.dto.Response;
 
@@ -22,17 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static ru.chernyshev.control.mockObject.MockOperation.createOperation;
+import static org.mockito.Mockito.*;
+import static ru.chernyshev.control.utils.MockOperation.createOperation;
 
 /**
  * Тесты на верификацию выставленных значений
- * **/
+ **/
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CheckExecutingTest.ProgramLoadAndExecuteConfiguration.class)
 @AutoConfigureMockMvc
@@ -42,7 +37,10 @@ public class CheckExecutingTest {
     static class ProgramLoadAndExecuteConfiguration {
 
         @MockBean
-        private RestClientService restClientService;
+        private IRestClientService restClientService;
+
+        @MockBean
+        private ITelemetryService telemetryService;
 
         @Bean
         public ObjectMapper objectMapper() {
@@ -50,22 +48,17 @@ public class CheckExecutingTest {
         }
 
         @Bean
-        public ITelemetryService telemetryService() {
-            return new MockTelemetryService();
-        }
-
-        @Bean
-        public MessageSender messageSender(ObjectMapper objectMapper) {
+        public IMessageSender messageSender(ObjectMapper objectMapper) {
             return new MessageSender(objectMapper);
         }
     }
 
     @Autowired
-    private MockTelemetryService telemetryService;
+    private ITelemetryService telemetryService;
     @Autowired
-    private MessageSender messageSender;
+    private IMessageSender messageSender;
     @Autowired
-    private RestClientService restClientService;
+    private IRestClientService restClientService;
 
     /**
      * Тест при проверке выставления параметра пришло верное значение
@@ -85,7 +78,7 @@ public class CheckExecutingTest {
         new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender).run();
 
         latch.await(1L, TimeUnit.SECONDS);
-        assertThat(telemetryService.getMessages().size(), is(0));
+        verify(telemetryService, never()).send(any(), anyString());
     }
 
     /**
@@ -106,7 +99,8 @@ public class CheckExecutingTest {
         new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender).run();
 
         latch.await(1L, TimeUnit.SECONDS);
-        assertThat(telemetryService.getMessages().get(0), is("Check operation result.Value was not set. Ids: 1."));
+        verify(telemetryService, times(1))
+                .send(TelemetryType.ERROR, "Check operation result.Value was not set. Ids: 1.");
     }
 
     /**
@@ -127,12 +121,42 @@ public class CheckExecutingTest {
         new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender).run();
 
         latch.await(1L, TimeUnit.SECONDS);
-        assertThat(telemetryService.getMessages().get(0), is("Check operation result.Value was not set. Ids: 1."));
+        verify(telemetryService, times(1))
+                .send(TelemetryType.ERROR, "Check operation result.Value was not set. Ids: 1.");
+    }
+
+    /**
+     * Тест при проверке выставления параметра пришло одно верное и одно не верное значение
+     */
+    @Test
+    public void diferentValueOperationSetTest() throws InterruptedException {
+        final CountDownLatch latch = new CountDownLatch(1);
+        String paramName1 = "param1";
+        String paramName2 = "param2";
+
+        List<Operation> operations = new ArrayList<>();
+        operations.add(createOperation(1, paramName1));
+        operations.add(createOperation(2, paramName2));
+
+        doAnswer(
+                (Answer<Response>) invocation ->
+                        Response.newBuilder()
+                                .add(paramName1, 10)
+                                .add(paramName2, 1)
+                                .build())
+                .when(restClientService)
+                .get(paramName1 + "," + paramName2);
+
+        new OperationExecutingCheckCommand(restClientService, telemetryService, operations, messageSender).run();
+
+        latch.await(1L, TimeUnit.SECONDS);
+        verify(telemetryService, times(1)).
+                send(TelemetryType.ERROR, "Check operation result.Value was not set. Ids: 2.");
     }
 
     /**
      * Выход если пришедшее неверное значение критическое
-     * */
+     */
     @Test(expected = EOFException.class)
     public void checkOperationAtOneTimeTestdsds() throws InterruptedException {
         new Expectations(System.class) {{

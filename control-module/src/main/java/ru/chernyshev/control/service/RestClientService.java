@@ -13,7 +13,7 @@ import ru.chernyshev.ifaces.dto.Response;
 import java.util.Map;
 
 @Service
-public class RestClientService {
+public class RestClientService implements IRestClientService{
 
     private final RestTemplate restTemplate;
     private final String exchangeUri;

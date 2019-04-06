@@ -13,10 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.chernyshev.control.dto.Operation;
-import ru.chernyshev.control.service.MessageSender;
-import ru.chernyshev.control.service.OperationExecuteCommand;
-import ru.chernyshev.control.service.RestClientService;
-import ru.chernyshev.control.service.TelemetryService;
+import ru.chernyshev.control.service.*;
 import ru.chernyshev.ifaces.dto.Response;
 
 import java.util.ArrayList;
@@ -28,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import static ru.chernyshev.control.mockObject.MockOperation.createOperation;
+import static ru.chernyshev.control.utils.MockOperation.createOperation;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ProgramCheckTest.ProgramLoadAndExecuteConfiguration.class)
@@ -39,9 +36,9 @@ public class ProgramCheckTest {
     static class ProgramLoadAndExecuteConfiguration {
 
         @MockBean
-        private RestClientService restClientService;
+        private IRestClientService restClientService;
         @MockBean
-        private TelemetryService telemetryService;
+        private ITelemetryService telemetryService;
 
         @Bean
         public ObjectMapper objectMapper() {
@@ -49,17 +46,17 @@ public class ProgramCheckTest {
         }
 
         @Bean
-        public MessageSender messageSender(ObjectMapper objectMapper) {
+        public IMessageSender messageSender(ObjectMapper objectMapper) {
             return new MessageSender(objectMapper);
         }
     }
 
     @Autowired
-    private TelemetryService telemetryService;
+    private ITelemetryService telemetryService;
     @Autowired
-    private MessageSender messageSender;
+    private IMessageSender messageSender;
     @Autowired
-    private RestClientService restClientService;
+    private IRestClientService restClientService;
 
     /**
      * Тест на вызов команды проверки установки параметров

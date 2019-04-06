@@ -5,10 +5,7 @@ import ru.chernyshev.control.dto.FlyProgram;
 import ru.chernyshev.control.dto.Operation;
 import ru.chernyshev.control.service.ConfigurationParam;
 
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 
 import static java.util.stream.Collectors.toList;
@@ -48,7 +45,7 @@ public class OperationValidator {
             addOperationsIfNeed(wrongOperations, notUniqueId, ProgramErrorType.NOT_UNIQUE_ID);
 
             if (!OperationValidator.isValid(operation)) {
-                addOperationsIfNeed(wrongOperations, Collections.singletonList(operation), ProgramErrorType.WRONG_VALUES);
+                addOperationsIfNeed(wrongOperations, Arrays.asList(operation), ProgramErrorType.WRONG_VALUES);
             }
         }
 

@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.chernyshev.control.model.Log;
+import ru.chernyshev.control.service.IMessageSender;
 import ru.chernyshev.control.service.MessageSender;
 
 import java.io.ByteArrayOutputStream;
@@ -32,7 +33,7 @@ public class StdoutTest {
         }
 
         @Bean
-        public MessageSender messageSender(ObjectMapper objectMapper) {
+        public IMessageSender messageSender(ObjectMapper objectMapper) {
             return new MessageSender(objectMapper);
         }
     }
@@ -43,7 +44,7 @@ public class StdoutTest {
     private final PrintStream originalErr = System.err;
 
     @Autowired
-    private MessageSender messageSender;
+    private IMessageSender messageSender;
 
     @Before
     public void setUpStreams() {

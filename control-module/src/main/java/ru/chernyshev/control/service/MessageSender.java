@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.chernyshev.control.model.Log;
 
 @Service
-public class MessageSender {
+public class MessageSender implements IMessageSender {
 
     private final ObjectMapper objectMapper;
 

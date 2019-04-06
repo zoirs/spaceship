@@ -25,13 +25,13 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
 
 @Service
-public class ProgramLoader {
+public class ProgramLoader implements IProgramLoader {
 
     private static final String PREFIX_MSG = "Program load. ";
 
-    private final MessageSender messageSender;
-    private final RestClientService restClientService;
-    private final TelemetryService telemetryService;
+    private final IMessageSender messageSender;
+    private final IRestClientService restClientService;
+    private final ITelemetryService telemetryService;
     private final ObjectMapper objectMapper;
     private final String flightProgramPath;
 
@@ -40,9 +40,9 @@ public class ProgramLoader {
     private FlyProgram flyProgram;
 
     @Autowired
-    public ProgramLoader(RestClientService restClientService,
-                         TelemetryService telemetryService,
-                         MessageSender messageSender,
+    public ProgramLoader(IRestClientService restClientService,
+                         ITelemetryService telemetryService,
+                         IMessageSender messageSender,
                          ObjectMapper objectMapper,
                          String flightProgramPath) {
         this.restClientService = restClientService;

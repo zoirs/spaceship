@@ -19,12 +19,12 @@ public class OperationExecuteCommand implements Runnable {
 
     private final List<Operation> operations;
     private final ITelemetryService telemetryService;
-    private final MessageSender messageSender;
+    private final IMessageSender messageSender;
+    private final IRestClientService restClientService;
+
     private final ScheduledExecutorService executor;
-    private final RestClientService restClientService;
 
-
-    public OperationExecuteCommand(ITelemetryService telemetryService, List<Operation> operations, MessageSender messageSender, RestClientService restClientService) {
+    public OperationExecuteCommand(ITelemetryService telemetryService, List<Operation> operations, IMessageSender messageSender, IRestClientService restClientService) {
         this.telemetryService = telemetryService;
         this.operations = operations;
         this.messageSender = messageSender;

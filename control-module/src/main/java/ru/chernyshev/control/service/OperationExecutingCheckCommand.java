@@ -15,13 +15,13 @@ public class OperationExecutingCheckCommand implements Runnable {
 
     private static final String PREFIX_MSG = "Check operation result.";
 
-    private final RestClientService restClientService;
+    private final IRestClientService restClientService;
     private final ITelemetryService telemetryService;
-    private final MessageSender messageSender;
+    private final IMessageSender messageSender;
 
     private final List<Operation> operations;
 
-    public OperationExecutingCheckCommand(RestClientService restClientService, ITelemetryService telemetryService, List<Operation> operations, MessageSender messageSender) {
+    public OperationExecutingCheckCommand(IRestClientService restClientService, ITelemetryService telemetryService, List<Operation> operations, IMessageSender messageSender) {
         this.restClientService = restClientService;
         this.telemetryService = telemetryService;
         this.messageSender = messageSender;
@@ -59,7 +59,7 @@ public class OperationExecutingCheckCommand implements Runnable {
 
         if (!notExecutedOperation.isEmpty()) {
             Error operationError = Error.createOperationError(notExecutedOperation);
-            telemetryService.send(TelemetryType.ERROR, PREFIX_MSG +  operationError.getMessage());
+            telemetryService.send(TelemetryType.ERROR, PREFIX_MSG + operationError.getMessage());
             if (operationError.isCritical()) {
                 System.exit(operationError.getExitCode());
             }

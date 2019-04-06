@@ -13,10 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.chernyshev.control.service.MessageSender;
-import ru.chernyshev.control.service.ProgramLoader;
-import ru.chernyshev.control.service.RestClientService;
-import ru.chernyshev.control.service.TelemetryService;
+import ru.chernyshev.control.service.*;
 import ru.chernyshev.ifaces.dto.Response;
 
 import java.io.UnsupportedEncodingException;
@@ -39,9 +36,9 @@ public class ProgramLoadAndExecuteTest {
     static class ProgramLoadAndExecuteConfiguration {
 
         @MockBean
-        private RestClientService restClientService;
+        private IRestClientService restClientService;
         @MockBean
-        private TelemetryService telemetryService;
+        private ITelemetryService telemetryService;
 
         @Bean
         public ObjectMapper objectMapper() {
@@ -49,12 +46,12 @@ public class ProgramLoadAndExecuteTest {
         }
 
         @Bean
-        public MessageSender messageSender(ObjectMapper objectMapper) {
+        public IMessageSender messageSender(ObjectMapper objectMapper) {
             return new MessageSender(objectMapper);
         }
 
         @Bean
-        public ProgramLoader programLoader(MessageSender messageSender, ObjectMapper objectMapper) throws UnsupportedEncodingException {
+        public IProgramLoader programLoader(MessageSender messageSender, ObjectMapper objectMapper) throws UnsupportedEncodingException {
             URL resource = this.getClass().getResource("/programmMoreOperation.json");
             String path = URLDecoder.decode(resource.getFile(), "UTF-8");
 
@@ -63,7 +60,7 @@ public class ProgramLoadAndExecuteTest {
     }
 
     @Autowired
-    private RestClientService restClientService;
+    private IRestClientService restClientService;
 
     /**
      * Тест на запуск трех операций из программы двумя командами

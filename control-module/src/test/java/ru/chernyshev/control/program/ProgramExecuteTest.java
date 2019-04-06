@@ -15,10 +15,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.chernyshev.control.dto.FlyProgram;
 import ru.chernyshev.control.dto.Operation;
-import ru.chernyshev.control.service.MessageSender;
-import ru.chernyshev.control.service.ProgramLoader;
-import ru.chernyshev.control.service.RestClientService;
-import ru.chernyshev.control.service.TelemetryService;
+import ru.chernyshev.control.service.*;
+import ru.chernyshev.control.utils.MockProgram;
 import ru.chernyshev.ifaces.dto.Response;
 
 import java.io.UnsupportedEncodingException;
@@ -32,7 +30,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import static ru.chernyshev.control.mockObject.MockOperation.createOperation;
+import static ru.chernyshev.control.utils.MockOperation.createOperation;
+import static ru.chernyshev.control.utils.MockProgram.createFlyProgram;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ProgramExecuteTest.ProgramLoadAndExecuteConfiguration.class)
@@ -43,9 +42,9 @@ public class ProgramExecuteTest {
     static class ProgramLoadAndExecuteConfiguration {
 
         @MockBean
-        private RestClientService restClientService;
+        private IRestClientService restClientService;
         @MockBean
-        private TelemetryService telemetryService;
+        private ITelemetryService telemetryService;
 
         @Bean
         public ObjectMapper objectMapper() {
@@ -53,7 +52,7 @@ public class ProgramExecuteTest {
         }
 
         @Bean
-        public MessageSender messageSender(ObjectMapper objectMapper) {
+        public IMessageSender messageSender(ObjectMapper objectMapper) {
             return new MessageSender(objectMapper);
         }
 
@@ -63,7 +62,7 @@ public class ProgramExecuteTest {
         }
 
         static class ProgramLoaderTest extends ProgramLoader {
-            ProgramLoaderTest(RestClientService restClientService, TelemetryService telemetryService, MessageSender messageSender, ObjectMapper objectMapper, String flightProgramPath) {
+            ProgramLoaderTest(IRestClientService restClientService, ITelemetryService telemetryService, IMessageSender messageSender, ObjectMapper objectMapper, String flightProgramPath) {
                 super(restClientService, telemetryService, messageSender, objectMapper, flightProgramPath);
             }
 
@@ -75,9 +74,9 @@ public class ProgramExecuteTest {
     }
 
     @Autowired
-    private ProgramLoader programLoader;
+    private IProgramLoader programLoader;
     @Autowired
-    private RestClientService restClientService;
+    private IRestClientService restClientService;
 
     /**
      * Тест на запуск трех операций одной командой
@@ -87,17 +86,13 @@ public class ProgramExecuteTest {
         final CountDownLatch latch = new CountDownLatch(1);
         AtomicInteger countCommand = new AtomicInteger();
 
-        FlyProgram flyProgram = mock(FlyProgram.class);
-        when(flyProgram.getStartUp()).thenReturn((int) (new Date().getTime() / 1000));
         List<Operation> operations = new ArrayList<>();
 
         operations.add(createOperation(1, "param1"));
         operations.add(createOperation(2, "param2"));
         operations.add(createOperation(3, "param3"));
 
-        when(flyProgram.getOperations()).thenReturn(operations);
-
-        programLoader.execute(flyProgram);
+        programLoader.execute(createFlyProgram(operations));
 
         doAnswer((Answer<Response>) invocation -> {
                     latch.countDown();
@@ -127,9 +122,9 @@ public class ProgramExecuteTest {
         when(flyProgram.getStartUp()).thenReturn((int) (new Date().getTime() / 1000));
         List<Operation> operations = new ArrayList<>();
 
-        operations.add(createOperation(1, "param1", 1));
-        operations.add(createOperation(2, "param2", 2));
-        operations.add(createOperation(3, "param3", 3));
+        operations.add(createOperation(1, "param1", 0, 1));
+        operations.add(createOperation(2, "param2", 0, 2));
+        operations.add(createOperation(3, "param3", 0, 3));
 
         when(flyProgram.getOperations()).thenReturn(operations);
 

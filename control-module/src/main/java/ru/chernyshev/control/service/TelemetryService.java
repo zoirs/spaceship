@@ -4,10 +4,8 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.chernyshev.control.dto.Operation;
 import ru.chernyshev.control.dto.TelemetryDto;
 import ru.chernyshev.control.model.Log;
-import ru.chernyshev.ifaces.dto.ConfigurationValues;
 import ru.chernyshev.ifaces.dto.Response;
 
 import java.util.List;
@@ -18,19 +16,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class TelemetryService implements ITelemetryService{
+public class TelemetryService implements ITelemetryService {
 
     private final int telemetryFreq;
-    private final MessageSender messageSender;
-    private final RestClientService restClientService;
-    //    private final SpaceshipService spaceshipService;
+    private final IMessageSender messageSender;
+    private final IRestClientService restClientService;
     private ScheduledExecutorService scheduler;
 
     @Autowired
-    public TelemetryService(int telemetryFreq, MessageSender messageSender, RestClientService restClientService) {//}, SpaceshipService spaceshipService) {
+    public TelemetryService(int telemetryFreq, IMessageSender messageSender, RestClientService restClientService) {//}, SpaceshipService spaceshipService) {
         this.telemetryFreq = telemetryFreq;
         this.messageSender = messageSender;
-//        this.spaceshipService = spaceshipService;
         this.restClientService = restClientService;
         this.scheduler = Executors.newScheduledThreadPool(1);
     }
