@@ -1,12 +1,21 @@
 package ru.chernyshev.control.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@SuppressWarnings("UnusedDeclaration")
 public class Operation {
 
-    private Integer id;
+    @JsonProperty
     private Integer deltaT;
+    @JsonProperty
+    private Integer id;
+    @JsonProperty
     private String variable;
+    @JsonProperty
     private int value;
+    @JsonProperty
     private Integer timeout;
+    @JsonProperty
     private boolean critical;
 
     public Integer getId() {

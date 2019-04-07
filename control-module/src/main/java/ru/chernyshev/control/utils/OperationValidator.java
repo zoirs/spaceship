@@ -28,14 +28,14 @@ public class OperationValidator {
         }
 
         for (Operation operation : flyProgram.getOperations()) {
-            List<Operation> dublicate = flyProgram.getOperations()
+            List<Operation> duplicate = flyProgram.getOperations()
                     .stream()
                     .filter(o -> !o.equals(operation) &&
                             o.getVariable().equals(operation.getVariable()) &&
                             o.getDeltaT().equals(operation.getDeltaT()))
                     .collect(toList());
 
-            addOperationsIfNeed(wrongOperations, dublicate, ProgramErrorType.DUBLICATE);
+            addOperationsIfNeed(wrongOperations, duplicate, ProgramErrorType.DUPLICATE);
 
             List<Operation> notUniqueId = flyProgram.getOperations()
                     .stream()

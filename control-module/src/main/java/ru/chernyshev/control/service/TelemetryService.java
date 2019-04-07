@@ -23,7 +23,7 @@ public class TelemetryService implements ITelemetryService {
     private final int telemetryFreq;
     private final IMessageSender messageSender;
     private final IRestClientService restClientService;
-    private ScheduledExecutorService scheduler;
+    private final ScheduledExecutorService scheduler;
 
     @Autowired
     public TelemetryService(int telemetryFreq, IMessageSender messageSender, RestClientService restClientService) {//}, SpaceshipService spaceshipService) {

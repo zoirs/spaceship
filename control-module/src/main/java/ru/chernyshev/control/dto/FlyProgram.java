@@ -26,7 +26,8 @@ public class FlyProgram {
      * Массив задач
      */
     @JsonProperty("operations")
-    private List<Operation> operations = null;
+    @SuppressWarnings("unused")
+    private List<Operation> operations;
 
     /**
      * @return Время когда сервис был запущен (Unix timestamp, seconds)

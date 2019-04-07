@@ -19,16 +19,15 @@ public class LogMessage {
     private static final String TRACE = "trace";
     private static final String INFO = "info";
     private static final String WARN = "warn";
-    private static final String ERROR = "error";
 
     @JsonProperty("level")
-    private String level;
+    private final String level;
 
     @JsonProperty("timestamp")
-    private int timestamp;
+    private final int timestamp;
 
     @JsonProperty("message")
-    private String message;
+    private final String message;
 
     private LogMessage(String level, String message) {
         this.level = level;
@@ -46,10 +45,6 @@ public class LogMessage {
 
     public static LogMessage warn(String message) {
         return new LogMessage(WARN, message);
-    }
-
-    public static LogMessage error(String message) {
-        return new LogMessage(ERROR, message);
     }
 
     @Override

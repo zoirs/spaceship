@@ -131,7 +131,7 @@ public class CheckExecutingTest {
      * Тест при проверке выставления параметра пришло одно верное и одно не верное значение
      */
     @Test
-    public void diferentValueOperationSetTest() throws InterruptedException {
+    public void differentValueOperationSetTest() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
         String paramName1 = "param1";
         String paramName2 = "param2";
@@ -160,7 +160,7 @@ public class CheckExecutingTest {
      * Выход если пришедшее неверное значение критическое
      */
     @Test(expected = EOFException.class)
-    public void checkOperationAtOneTimeTestdsds() throws InterruptedException {
+    public void checkCriticalOperationTest() throws InterruptedException {
         new Expectations(System.class) {{
             System.exit(anyInt);
             result = new EOFException();

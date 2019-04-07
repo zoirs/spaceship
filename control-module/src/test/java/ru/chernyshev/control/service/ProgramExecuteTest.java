@@ -17,7 +17,6 @@ import ru.chernyshev.control.dto.FlyProgram;
 import ru.chernyshev.control.dto.Operation;
 import ru.chernyshev.ifaces.dto.Response;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,13 +54,13 @@ public class ProgramExecuteTest {
         }
 
         @Bean
-        public ProgramLoader programLoader(MessageSender messageSender, ObjectMapper objectMapper) throws UnsupportedEncodingException {
-            return new ProgramLoaderTest(restClientService, telemetryService, messageSender, objectMapper, "");
+        public ProgramLoader programLoader(MessageSender messageSender, ObjectMapper objectMapper) {
+            return new ProgramLoaderTest(restClientService, telemetryService, messageSender, objectMapper);
         }
 
         static class ProgramLoaderTest extends ProgramLoaderImpl {
-            ProgramLoaderTest(IRestClientService restClientService, ITelemetryService telemetryService, IMessageSender messageSender, ObjectMapper objectMapper, String flightProgramPath) {
-                super(restClientService, telemetryService, messageSender, objectMapper, flightProgramPath);
+            ProgramLoaderTest(IRestClientService restClientService, ITelemetryService telemetryService, IMessageSender messageSender, ObjectMapper objectMapper) {
+                super(restClientService, telemetryService, messageSender, objectMapper, "");
             }
 
             @Override

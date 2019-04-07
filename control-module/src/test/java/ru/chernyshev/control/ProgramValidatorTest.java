@@ -82,14 +82,14 @@ public class ProgramValidatorTest {
     }
 
     @Test
-    public void dublicateTest() {
+    public void duplicateTest() {
         List<Operation> operations = new ArrayList<>();
         operations.add(createOperation(1, "coolingSystemPowerPct", 1, 2));
         operations.add(createOperation(2, "coolingSystemPowerPct", 3,2));
         FlyProgram flyProgram = createFlyProgram(operations);
         Map<ProgramErrorType, List<Operation>> wrongOperation = findWrongOperation(flyProgram);
         assertThat(wrongOperation.size(), is(1));
-        assertTrue(wrongOperation.containsKey(ProgramErrorType.DUBLICATE));
+        assertTrue(wrongOperation.containsKey(ProgramErrorType.DUPLICATE));
     }
 
     @Test

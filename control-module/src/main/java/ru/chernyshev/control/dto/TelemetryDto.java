@@ -9,13 +9,13 @@ import java.util.Date;
 
 public class TelemetryDto {
     @JsonProperty("type")
-    private String type;
+    private final String type;
 
     @JsonProperty("timestamp")
-    private int timestamp;
+    private final int timestamp;
 
     @JsonProperty("message")
-    private String message;
+    private final String message;
 
     public TelemetryDto(TelemetryType type, String message) {
         this.type = type.getKey();

@@ -52,10 +52,10 @@ public class ProgramLoaderTest {
         }
 
         @Bean
-        public IProgramLoader programLoader(RestClientService restrestClientService, MessageSender messageSender, ObjectMapper objectMapper) throws UnsupportedEncodingException {
-            URL resource = this.getClass().getResource("/programmOneOperation.json");
+        public IProgramLoader programLoader(RestClientService restClientService, MessageSender messageSender, ObjectMapper objectMapper) throws UnsupportedEncodingException {
+            URL resource = this.getClass().getResource("/programOneOperation.json");
             String path = URLDecoder.decode(resource.getFile(), "UTF-8");
-            return new ProgramLoaderImpl(restrestClientService, mock(TelemetryService.class), messageSender, objectMapper, path);
+            return new ProgramLoaderImpl(restClientService, mock(TelemetryService.class), messageSender, objectMapper, path);
         }
     }
 

@@ -51,7 +51,7 @@ public class ProgramLoadAndExecuteTest {
 
         @Bean
         public IProgramLoader programLoader(MessageSender messageSender, ObjectMapper objectMapper) throws UnsupportedEncodingException {
-            URL resource = this.getClass().getResource("/programmMoreOperation.json");
+            URL resource = this.getClass().getResource("/programMoreOperation.json");
             String path = URLDecoder.decode(resource.getFile(), "UTF-8");
 
             return new ProgramLoaderImpl(restClientService, telemetryService, messageSender, objectMapper, path);

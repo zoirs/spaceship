@@ -32,19 +32,6 @@ public enum ConfigurationParam {
         return containsInTelemetry;
     }
 
-    public static ConfigurationParam getValueFor(String key) {
-        if (Strings.isEmpty(key)) {
-            return null;
-        }
-
-        for (ConfigurationParam confParam : values()) {
-            if (key.equals(confParam.key)) {
-                return confParam;
-            }
-        }
-        return null;
-    }
-
     public static boolean isValid(String key, Integer value) {
         if (value == null) {
             return false;
@@ -59,11 +46,20 @@ public enum ConfigurationParam {
         return param.max >= value;
     }
 
-    public static boolean isExist(String key) {
-        return getValueFor(key) != null;
-    }
-
     public String getKey() {
         return key;
+    }
+
+    private static ConfigurationParam getValueFor(String key) {
+        if (Strings.isEmpty(key)) {
+            return null;
+        }
+
+        for (ConfigurationParam confParam : values()) {
+            if (key.equals(confParam.key)) {
+                return confParam;
+            }
+        }
+        return null;
     }
 }

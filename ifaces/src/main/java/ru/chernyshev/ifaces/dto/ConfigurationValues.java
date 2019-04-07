@@ -19,6 +19,7 @@ public class ConfigurationValues {
     @JsonProperty("value")
     private Integer value;
 
+    @SuppressWarnings("unused")// Для json
     protected ConfigurationValues() {
     }
 

@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class Response {
 
-    private Map<String, ConfigurationValues> response;
+    private final Map<String, ConfigurationValues> response;
 
     private Response() {
         this.response = new HashMap<>();
@@ -20,6 +20,7 @@ public class Response {
     }
 
     @JsonAnySetter
+    @SuppressWarnings("WeakerAccess")
     public void add(String key, ConfigurationValues value) {
         response.put(key, value);
     }
