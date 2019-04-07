@@ -30,7 +30,7 @@ public class MockOperation {
         when(operation.getTimeout()).thenReturn(timeout);
         when(operation.getVariable()).thenReturn(paramName);
         when(operation.getValue()).thenReturn(10);
-        when(operation.getCritical()).thenReturn(isCritical);
+        when(operation.isCritical()).thenReturn(isCritical);
         return operation;
     }
 }

@@ -92,7 +92,7 @@ public class Operation {
     /**
      * @return Является ли отказ по параметру критическим (optional, default true)
      */
-    public boolean getCritical() {
+    public boolean isCritical() {
         return critical;
     }
 

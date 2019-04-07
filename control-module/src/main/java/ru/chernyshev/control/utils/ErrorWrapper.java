@@ -88,7 +88,7 @@ public class ErrorWrapper {
     }
 
     private static boolean isCritical(List<Operation> errorParams) {
-        return errorParams.stream().anyMatch(Operation::getCritical);
+        return errorParams.stream().anyMatch(Operation::isCritical);
     }
 
     private static String getOperationIds(List<Operation> errorParams) {

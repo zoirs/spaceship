@@ -1,6 +1,7 @@
 package ru.chernyshev.control.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import mockit.Expectations;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 @RunWith(SpringRunner.class)
@@ -83,5 +83,6 @@ public class ProgramLoaderTest {
         assertThat(operation.getVariable(), is("coolingSystemPowerPct"));
         assertThat(operation.getValue(), is(30));
         assertThat(operation.getTimeout(), is(1));
+        assertFalse(operation.isCritical());
     }
 }

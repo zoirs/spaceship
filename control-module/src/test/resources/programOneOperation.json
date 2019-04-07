@@ -6,7 +6,8 @@
       "deltaT": 0,
       "variable": "coolingSystemPowerPct",
       "value": 30,
-      "timeout": 1
+      "timeout": 1,
+      "critical": false
     }
   ]
 }
