@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.chernyshev.control.dto.LogMessage;
 
+/**
+ * Сервис отправки сообщений
+ */
 @Service
 public class MessageSender implements IMessageSender {
 
@@ -16,10 +19,16 @@ public class MessageSender implements IMessageSender {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Запись сообщений в stderr
+     */
     public void stderr(String message) {
         System.err.println(message);
     }
 
+    /**
+     * Запись сообщений в stdout
+     */
     public void stdout(LogMessage log) {
         System.out.println(convertToString(log));
     }

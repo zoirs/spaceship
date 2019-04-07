@@ -11,14 +11,25 @@ import java.util.function.BiFunction;
 
 import static java.util.stream.Collectors.toList;
 
+/**
+ * Проверка операций из программы полета
+ */
 public class OperationValidator {
 
+    /**
+     * @return true если все параметры задачи валидны
+     */
     public static boolean isValid(Operation operation) {
         return operation.getTimeout() > 0 &&
                 operation.getId() > 0 &&
                 ConfigurationParam.isValid(operation.getVariable(), operation.getValue());
     }
 
+    /**
+     * Валидация программы полета
+     *
+     * @return карту где ключ - тип ошибки а значение - список задач с таким типом ошибки
+     */
     public static Map<ProgramErrorType, List<Operation>> findWrongOperation(FlyProgram flyProgram) {
         Map<ProgramErrorType, List<Operation>> wrongOperations = new EnumMap<>(ProgramErrorType.class);
 

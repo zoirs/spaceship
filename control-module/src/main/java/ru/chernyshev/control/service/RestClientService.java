@@ -12,12 +12,26 @@ import ru.chernyshev.ifaces.dto.Response;
 
 import java.util.Map;
 
+/**
+ * Сервис взаимодействия с restApi
+ */
 @Service
-public class RestClientService implements IRestClientService{
+public class RestClientService implements IRestClientService {
 
-    private final RestTemplate restTemplate;
+    /**
+     * URI REST API модуля обмена информацией
+     */
     private final String exchangeUri;
+
+    /**
+     * Контроллер REST API модуля обмена информацией
+     */
     private final String controller = "/settings/";
+
+    /**
+     * Клиент управления http запросами
+     * */
+    private final RestTemplate restTemplate;
 
     @Autowired
     public RestClientService(RestTemplate restTemplate, String exchangeUri) {
@@ -25,13 +39,25 @@ public class RestClientService implements IRestClientService{
         this.exchangeUri = exchangeUri;
     }
 
-    public Response get(String param) {
-        return restTemplate.getForObject(exchangeUri + controller + param, Response.class);
+    /**
+     * Чтение текущих параметров
+     *
+     * @param params список параметров системы через запятую
+     * @return значения переданных параметров
+     */
+    public Response get(String params) {
+        return restTemplate.getForObject(exchangeUri + controller + params, Response.class);
     }
 
+    /**
+     * Установка параметров
+     *
+     * @param param карта ключ-название параметра значение-числовое значение параметра
+     * @return значения переданных параметров
+     */
     public Response send(Map<String, Integer> param) throws JsonProcessingException {
         HttpEntity<String> entity = createRequest(param);
-        return restTemplate.patchForObject(exchangeUri  + controller, entity, Response.class);
+        return restTemplate.patchForObject(exchangeUri + controller, entity, Response.class);
     }
 
     private HttpEntity<String> createRequest(Map<String, Integer> requestParam) throws JsonProcessingException {

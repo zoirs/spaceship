@@ -1,7 +1,7 @@
 package ru.chernyshev.control.service.tasks;
 
-import ru.chernyshev.control.dto.Operation;
 import ru.chernyshev.control.dto.LogMessage;
+import ru.chernyshev.control.dto.Operation;
 import ru.chernyshev.control.service.IMessageSender;
 import ru.chernyshev.control.service.IRestClientService;
 import ru.chernyshev.control.service.ITelemetryService;
@@ -18,14 +18,36 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
+/**
+ * Команда выполнения задач из программы полета
+ */
 public class OperationExecuteCommand implements Runnable {
 
     private static final String PREFIX_MSG = "Execute operation.";
 
+    /**
+     * Массив команд на выполнение
+     */
     private final List<Operation> operations;
+
+    /**
+     * Сервис телеметрии
+     */
     private final ITelemetryService telemetryService;
+
+    /**
+     * Сервис отправки сообщение
+     */
     private final IMessageSender messageSender;
+
+    /**
+     * Сервис взаимодействия с restApi
+     */
     private final IRestClientService restClientService;
+
+    /**
+     * Фукнция требующая выполнения по завершению выполнения команды
+     */
     private final Runnable checkedCallback;
 
     private final ScheduledExecutorService executor;
@@ -40,6 +62,9 @@ public class OperationExecuteCommand implements Runnable {
         this.executor = Executors.newScheduledThreadPool(5);
     }
 
+    /**
+     * Исполняет требуемые задачи, запускает команду проверки выполнения задач
+     */
     @Override
     public void run() {
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + " Start: " + getCurrentOperations()));

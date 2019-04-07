@@ -2,6 +2,9 @@ package ru.chernyshev.control.type;
 
 import org.apache.logging.log4j.util.Strings;
 
+/**
+ * Список параметров спутника
+ */
 public enum ConfigurationParam {
 
     RADIO_POWER_DBM("radioPowerDbm", 20, 80, false),
@@ -15,10 +18,24 @@ public enum ConfigurationParam {
     TEMPERATURE_INTERNAL_DEG("temperatureInternalDeg", -50, 150, true),
     ;
 
+    /**
+     * Наименование параметра
+     */
     private final String key;
 
+    /**
+     * Максимально возможное значение
+     */
     private final int max;
+
+    /**
+     * Минимально возможное значение
+     */
     private final int min;
+
+    /**
+     * Необходимоть указания в телеметрии
+     */
     private final boolean containsInTelemetry;
 
     ConfigurationParam(String key, int min, int max, boolean containsInTelemetry) {
@@ -28,24 +45,35 @@ public enum ConfigurationParam {
         this.containsInTelemetry = containsInTelemetry;
     }
 
+    /**
+     * @return true если параметр необходимо передавать в телеметрии
+     */
     public boolean isContainsInTelemetry() {
         return containsInTelemetry;
     }
 
+    /**
+     * @param key   наименование параметра
+     * @param value значение параметра
+     * @return true если значение параметра валидно
+     */
     public static boolean isValid(String key, Integer value) {
         if (value == null) {
             return false;
         }
         ConfigurationParam param = getValueFor(key);
-        if (param == null){
+        if (param == null) {
             return false;
         }
-        if (param.min > value){
+        if (param.min > value) {
             return false;
         }
         return param.max >= value;
     }
 
+    /**
+     * @return наименование параметра
+     */
     public String getKey() {
         return key;
     }

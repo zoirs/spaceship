@@ -6,13 +6,13 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import ru.chernyshev.control.dto.FlyProgram;
-import ru.chernyshev.control.dto.Operation;
-import ru.chernyshev.control.type.ExitCodes;
 import ru.chernyshev.control.dto.LogMessage;
-import ru.chernyshev.control.type.TelemetryType;
+import ru.chernyshev.control.dto.Operation;
 import ru.chernyshev.control.service.tasks.OperationExecuteCommand;
-import ru.chernyshev.control.utils.OperationValidator;
+import ru.chernyshev.control.type.ExitCodes;
 import ru.chernyshev.control.type.ProgramErrorType;
+import ru.chernyshev.control.type.TelemetryType;
+import ru.chernyshev.control.utils.OperationValidator;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,22 +28,46 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
+/**
+ * Сервис загрузки программы полета и запуска ее на выполенние
+ */
 @Service
 public class ProgramLoader implements IProgramLoader {
 
     private static final String PREFIX_MSG = "Program load. ";
 
+    /**
+     * Счетчик завершенных программ
+     */
     private CountDownLatch commandCounter;
 
+    /**
+     * Сервис отправки сообщение
+     */
     private final IMessageSender messageSender;
+
+    /**
+     * Сервис взаимодействия с restApi
+     */
     private final IRestClientService restClientService;
+
+    /**
+     * Сервис телеметрии
+     */
     private final ITelemetryService telemetryService;
-    private final ObjectMapper objectMapper;
+    /**
+     * Путь где лежит файл программы полета
+     */
     private final String flightProgramPath;
 
+    /**
+     * Программа полета
+     */
+    private FlyProgram flyProgram;
+
+    private final ObjectMapper objectMapper;
     private final ScheduledExecutorService executor;
 
-    private FlyProgram flyProgram;
 
     @Autowired
     public ProgramLoader(IRestClientService restClientService,
@@ -60,6 +84,9 @@ public class ProgramLoader implements IProgramLoader {
         this.executor = Executors.newScheduledThreadPool(5);
     }
 
+    /**
+     * Инициирует загрузку программы полета при старте приложения
+     */
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Start read"));
@@ -96,10 +123,9 @@ public class ProgramLoader implements IProgramLoader {
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Finish read"));
     }
 
-    public FlyProgram getFlyProgram() {
-        return flyProgram;
-    }
-
+    /**
+     * Запустить программу полета на выполнение
+     */
     public void execute(FlyProgram flyProgram) {
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Start execute"));
 
@@ -118,6 +144,13 @@ public class ProgramLoader implements IProgramLoader {
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Execute was schedule"));
 
         waitExecution(operationsByDelays.entrySet().size());
+    }
+
+    /**
+     * @return программу полета
+     */
+    public FlyProgram getFlyProgram() {
+        return flyProgram;
     }
 
     void waitExecution(int commandCount) {

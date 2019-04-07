@@ -1,12 +1,19 @@
 package ru.chernyshev.control.service;
 
-import org.springframework.stereotype.Service;
 import ru.chernyshev.control.dto.FlyProgram;
 
-@Service
+/**
+ * Сервис загрузки программы полета и запуска ее на выполенние
+ */
 public interface IProgramLoader {
 
+    /**
+     * Запустить программу полета на выполнение
+     */
     void execute(FlyProgram flyProgram);
 
+    /**
+     * @return программу полета
+     */
     FlyProgram getFlyProgram();
 }

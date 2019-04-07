@@ -17,15 +17,36 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Команда проверки выполнения задач
+ * */
 public class OperationExecutingCheckCommand implements Runnable {
 
     private static final String PREFIX_MSG = "Check operation result.";
 
+    /**
+     * Сервис взаимодействия с restApi
+     */
     private final IRestClientService restClientService;
+
+    /**
+     * Сервис телеметрии
+     */
     private final ITelemetryService telemetryService;
+
+    /**
+     * Сервис отправки сообщение
+     */
     private final IMessageSender messageSender;
+
+    /**
+     * Фукнция требующая выполнения по завершению выполнения команды
+     */
     private final Runnable checkedCallback;
 
+    /**
+     * Массив выполенных команд
+     */
     private final List<Operation> operations;
 
     public OperationExecutingCheckCommand(IRestClientService restClientService, ITelemetryService telemetryService, List<Operation> operations, IMessageSender messageSender, Runnable checkedCallback) {
@@ -36,6 +57,9 @@ public class OperationExecutingCheckCommand implements Runnable {
         this.checkedCallback = checkedCallback;
     }
 
+    /**
+     * Исполняет проверку выполнения задач
+     */
     @Override
     public void run() {
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Start"));

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
+ * Обертка для ошибок
  */
 public class ErrorWrapper {
 
@@ -18,7 +18,15 @@ public class ErrorWrapper {
      * Сообщение об ошибке
      */
     private String message;
+
+    /**
+     * Является ли ошибка сигналом завершению работы приложения
+     */
     private final boolean isCritical;
+
+    /**
+     * Код завершения работы приложения в случае критической ошибки
+     */
     private final int exitCode;
 
     private ErrorWrapper(boolean isCritical, ExitCodes exitCode) {
@@ -58,6 +66,27 @@ public class ErrorWrapper {
         return error;
     }
 
+    /**
+     * @return текстовое описание ошибки
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    /**
+     * @return true если программа должна завершиться из за ошибки
+     */
+    public boolean isCritical() {
+        return isCritical;
+    }
+
+    /**
+     * @return Код завершения работы приложения в случае критической ошибки
+     */
+    public int getExitCode() {
+        return exitCode;
+    }
+
     private static boolean isCritical(List<Operation> errorParams) {
         return errorParams.stream().anyMatch(Operation::getCritical);
     }
@@ -67,16 +96,5 @@ public class ErrorWrapper {
                 .collect(Collectors.joining(", "));
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public boolean isCritical() {
-        return isCritical;
-    }
-
-    public int getExitCode() {
-        return exitCode;
-    }
 
 }

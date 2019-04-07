@@ -1,5 +1,8 @@
 package ru.chernyshev.control.type;
 
+/**
+ * Типы сообщений телеметрии
+ * */
 public enum TelemetryType {
     ERROR("error"),
     VALUES("values");
@@ -10,6 +13,9 @@ public enum TelemetryType {
         this.key = key;
     }
 
+    /**
+     * @return наименование парамтера типа телеметрии
+     * */
     public String getKey() {
         return key;
     }

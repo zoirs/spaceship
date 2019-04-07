@@ -1,5 +1,8 @@
 package ru.chernyshev.control.type;
 
+/**
+ * Коды завершения работы приложения
+ */
 public enum ExitCodes {
 
     SUCCESS(0),
@@ -13,6 +16,9 @@ public enum ExitCodes {
         this.exitCode = exitCode;
     }
 
+    /**
+     * @return код завершения работы приложения
+     */
     public Integer getExitCode() {
         return exitCode;
     }
