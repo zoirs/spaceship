@@ -8,12 +8,28 @@ import java.util.List;
 
 /**
  * Программа полета
+ *
+ * Формат:
+ * {
+ *   "startUp": 1555016400,
+ *   "operations": [
+ *     {
+ *       "id": 1,
+ *       "deltaT": 0,
+ *       "variable": "coolingSystemPowerPercent",
+ *       "value": 30,
+ *       "timeout": 1
+ *     }
+ *     ...
+ *    ]
+ * }
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "startUp",
         "operations"
 })
+@SuppressWarnings("unused")
 public class FlyProgram {
 
     /**
@@ -26,7 +42,6 @@ public class FlyProgram {
      * Массив задач
      */
     @JsonProperty("operations")
-    @SuppressWarnings("unused")
     private List<Operation> operations;
 
     /**
@@ -34,11 +49,6 @@ public class FlyProgram {
      * */
     public Integer getStartUp() {
         return startUp;
-    }
-
-    //todo для теста
-    public void setStartUp(Integer startUp) {
-        this.startUp = startUp;
     }
 
     /**

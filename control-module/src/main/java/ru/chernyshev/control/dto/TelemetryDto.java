@@ -7,13 +7,36 @@ import ru.chernyshev.control.type.TelemetryType;
 
 import java.util.Date;
 
+/**
+ * Объект телеметрии передаваемой на землю
+ * <p>
+ * Формат:
+ * {
+ * "type": "error",
+ * "timestamp": 1555019400,
+ * "message": "..."
+ * }
+ */
 public class TelemetryDto {
+
+    /**
+     * Тип в текстовом формате. Допустимые типы
+     *
+     * @see TelemetryType
+     */
     @JsonProperty("type")
     private final String type;
 
+
+    /**
+     * Текущее время в формате Unix time
+     */
     @JsonProperty("timestamp")
     private final int timestamp;
 
+    /**
+     * Сообщение об ошибке в свободной форме.
+     */
     @JsonProperty("message")
     private final String message;
 
@@ -23,6 +46,9 @@ public class TelemetryDto {
         this.message = message;
     }
 
+    /**
+     * @return объект телеметрии в формате JSON
+     */
     public String toJson() {
         ObjectMapper objectMapper = new ObjectMapper();
         try {

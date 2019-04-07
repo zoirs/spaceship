@@ -91,7 +91,7 @@ public class ProgramLoader implements IProgramLoader {
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Finish read program"));
 
         telemetryService.start();
-        flyProgram.setStartUp((int) (new Date().getTime() / 1000)); // todo убрать, это для теста
+        //flyProgram.setStartUp((int) (new Date().getTime() / 1000)); // todo убрать, это для теста
         execute(flyProgram);
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Finish read"));
     }
