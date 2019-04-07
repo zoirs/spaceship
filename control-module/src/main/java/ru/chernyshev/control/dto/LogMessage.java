@@ -33,7 +33,7 @@ public class LogMessage {
      * Время сообщения лога
      */
     @JsonProperty("timestamp")
-    private String timestamp;
+    private final String timestamp;
 
     /**
      * Тескстовое сообщения лога
