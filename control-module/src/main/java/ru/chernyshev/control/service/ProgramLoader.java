@@ -164,7 +164,14 @@ public class ProgramLoader implements IProgramLoader {
     }
 
     private long getDelay(Date startupDate, Integer delayAfterStartup) {
-        return new Date().getTime() - startupDate.getTime() + delayAfterStartup * 1000;
+        long startTime = startupDate.getTime() + delayAfterStartup * 1000;
+        long currentTime = new Date().getTime();
+
+        if (startTime <= currentTime) {
+            return 0;
+        } else {
+            return startTime - currentTime;
+        }
     }
 
     private Runnable checkedCallback() {
