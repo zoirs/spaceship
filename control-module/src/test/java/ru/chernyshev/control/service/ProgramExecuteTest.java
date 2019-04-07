@@ -79,7 +79,7 @@ public class ProgramExecuteTest {
      * Тест на запуск трех операций одной командой
      */
     @Test
-    public void threeOperationAtOneTime() throws JsonProcessingException {
+    public void threeOperationAtOneTimeTest() throws JsonProcessingException {
         final CountDownLatch latch = new CountDownLatch(1);
         AtomicInteger countCommand = new AtomicInteger();
 
@@ -111,7 +111,7 @@ public class ProgramExecuteTest {
      * Тест на запуск трех операций тремя командами
      */
     @Test
-    public void threeOperationAtDifferentTime() throws JsonProcessingException {
+    public void threeOperationAtDifferentTimeTest() throws JsonProcessingException {
         final CountDownLatch latch = new CountDownLatch(3);
         AtomicInteger countCommand = new AtomicInteger();
 

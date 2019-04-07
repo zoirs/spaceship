@@ -6,6 +6,15 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Dto объект получаемый в ответ от rest api
+ * <p>
+ * Формат:
+ * {
+ * "orientationZenithAngleDeg": {"set": 180, "value": 180},
+ * "orientationAzimuthAngleDeg": {"set": 0, "value": 10}
+ * }
+ */
 public class Response {
 
     private final Map<String, ConfigurationValues> response;
@@ -29,6 +38,11 @@ public class Response {
         return new Response().new Builder();
     }
 
+    /**
+     * Вспомогательный объект для создания объекта
+     *
+     * @see Response
+     */
     public class Builder {
 
         private Builder() {

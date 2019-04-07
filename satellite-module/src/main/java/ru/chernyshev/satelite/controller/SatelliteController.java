@@ -12,6 +12,9 @@ import java.util.stream.Stream;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+/**
+ * Контроллер эмулятора модуля, используется для отладки
+ */
 @RestController
 public class SatelliteController {
 
@@ -24,10 +27,25 @@ public class SatelliteController {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Установка параметров
+     * <p>
+     * Формат параметров и значений:
+     * <p>
+     * {
+     * "orientationZenithAngleDeg": 180,
+     * "orientationAzimuthAngleDeg": 0
+     * }
+     *
+     * @return JSON-объект в формате:
+     * <p>
+     * {
+     * "orientationZenithAngleDeg": {"set": 180, "value": 180},
+     * "orientationAzimuthAngleDeg": {"set": 0, "value": 10}
+     * }
+     */
     @RequestMapping(value = "/settings", method = RequestMethod.PATCH, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> setSettings(@RequestBody Map<String, Integer> params) throws Exception {
-        System.out.println("Get request change setting");
-
         Response.Builder responseBuilder = Response.newBuilder();
 
         params.forEach((key, value) -> {
@@ -35,11 +53,21 @@ public class SatelliteController {
             responseBuilder.add(key, spaceshipService.getConfiguration(key));
         });
 
-        System.out.println("Change setting successfully");
-
         return ResponseEntity.ok(objectMapper.writeValueAsString(responseBuilder.build()));
     }
 
+    /**
+     * Чтение параметров
+     * Формат:
+     * orientationZenithAngleDeg,orientationAzimuthAngleDeg
+     *
+     * @return JSON-объект в формате:
+     * <p>
+     * {
+     * "orientationZenithAngleDeg": {"set": 180, "value": 180},
+     * "orientationAzimuthAngleDeg": {"set": 0, "value": 10}
+     * }
+     */
     @RequestMapping(value = "/settings/{keys}", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getSettings(@PathVariable String keys) throws Exception {
 
