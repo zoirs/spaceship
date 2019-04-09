@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.chernyshev.control.dto.Operation;
-import ru.chernyshev.control.service.tasks.OperationExecuteCommand;
 import ru.chernyshev.ifaces.dto.Response;
 
 import java.util.ArrayList;
@@ -24,8 +23,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 import static ru.chernyshev.control.utils.MockOperation.createOperation;
+import static ru.chernyshev.control.utils.MockProgram.createFlyProgram;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ProgramCheckTest.ProgramLoadAndExecuteConfiguration.class)
@@ -49,8 +50,27 @@ public class ProgramCheckTest {
         public IMessageSender messageSender(ObjectMapper objectMapper) {
             return new MessageSender(objectMapper);
         }
+
+        @Bean
+        public ProgramLoader programLoader(MessageSender messageSender, ObjectMapper objectMapper) {
+            return new ProgramCheckTest.ProgramLoadAndExecuteConfiguration.ProgramLoaderTest(restClientService, telemetryService, messageSender, objectMapper);
+        }
+
+        private static class ProgramLoaderTest extends ProgramLoaderImpl {
+            ProgramLoaderTest(IRestClientService restClientService, ITelemetryService telemetryService, IMessageSender messageSender, ObjectMapper objectMapper) {
+                super(restClientService, telemetryService, messageSender, objectMapper, "");
+            }
+
+            @Override
+            public void init() {
+                //do nothing
+            }
+        }
     }
 
+
+    @Autowired
+    private IProgramLoader programLoader;
     @Autowired
     private ITelemetryService telemetryService;
     @Autowired
@@ -80,7 +100,7 @@ public class ProgramCheckTest {
                 }
         ).when(restClientService).get(Mockito.anyString());
 
-        new OperationExecuteCommand(telemetryService, operations, messageSender, restClientService, null).run();
+        programLoader.execute(createFlyProgram(operations));
 
         try {
             boolean await = latch.await(1L, TimeUnit.SECONDS);
@@ -113,7 +133,7 @@ public class ProgramCheckTest {
                 }
         ).when(restClientService).get(Mockito.anyString());
 
-        new OperationExecuteCommand(telemetryService, operations, messageSender, restClientService, null).run();
+        programLoader.execute(createFlyProgram(operations));
 
         try {
             boolean await = latch.await(4L, TimeUnit.SECONDS);

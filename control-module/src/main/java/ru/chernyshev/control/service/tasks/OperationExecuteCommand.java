@@ -11,12 +11,7 @@ import ru.chernyshev.ifaces.dto.Response;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Команда выполнения задач из программы полета
@@ -45,21 +40,11 @@ public class OperationExecuteCommand implements Runnable {
      */
     private final IRestClientService restClientService;
 
-    /**
-     * Фукнция требующая выполнения по завершению выполнения команды
-     */
-    private final Runnable checkedCallback;
-
-    private final ScheduledExecutorService executor;
-
-    public OperationExecuteCommand(ITelemetryService telemetryService, List<Operation> operations, IMessageSender messageSender, IRestClientService restClientService, Runnable checkedCallback) {
+    public OperationExecuteCommand(ITelemetryService telemetryService, List<Operation> operations, IMessageSender messageSender, IRestClientService restClientService) {
         this.telemetryService = telemetryService;
         this.operations = operations;
         this.messageSender = messageSender;
         this.restClientService = restClientService;
-        this.checkedCallback = checkedCallback;
-
-        this.executor = Executors.newScheduledThreadPool(5);
     }
 
     /**
@@ -91,17 +76,6 @@ public class OperationExecuteCommand implements Runnable {
         }
 
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + " Get response: " + (response != null ? response.getResponse() : "")));
-
-        Map<Integer, List<Operation>> operationsByTimeout = operations
-                .stream()
-                .collect(groupingBy(Operation::getTimeout));
-
-        for (Map.Entry<Integer, List<Operation>> entry : operationsByTimeout.entrySet()) {
-            Integer timeout = entry.getKey();
-
-            OperationExecutingCheckCommand checkCommand = new OperationExecutingCheckCommand(restClientService, telemetryService, entry.getValue(), messageSender, checkedCallback);
-            executor.schedule(checkCommand, timeout, TimeUnit.SECONDS);
-        }
 
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Complete for ids: " + getCurrentOperations()));
     }

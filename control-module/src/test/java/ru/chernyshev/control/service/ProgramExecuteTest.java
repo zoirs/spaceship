@@ -58,7 +58,7 @@ public class ProgramExecuteTest {
             return new ProgramLoaderTest(restClientService, telemetryService, messageSender, objectMapper);
         }
 
-        static class ProgramLoaderTest extends ProgramLoaderImpl {
+        private static class ProgramLoaderTest extends ProgramLoaderImpl {
             ProgramLoaderTest(IRestClientService restClientService, ITelemetryService telemetryService, IMessageSender messageSender, ObjectMapper objectMapper) {
                 super(restClientService, telemetryService, messageSender, objectMapper, "");
             }

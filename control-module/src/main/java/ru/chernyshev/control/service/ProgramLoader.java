@@ -9,6 +9,7 @@ import ru.chernyshev.control.dto.FlyProgram;
 import ru.chernyshev.control.dto.LogMessage;
 import ru.chernyshev.control.dto.Operation;
 import ru.chernyshev.control.service.tasks.OperationExecuteCommand;
+import ru.chernyshev.control.service.tasks.OperationExecutingCheckCommand;
 import ru.chernyshev.control.type.ExitCodes;
 import ru.chernyshev.control.type.ProgramErrorType;
 import ru.chernyshev.control.type.TelemetryType;
@@ -136,12 +137,24 @@ public class ProgramLoader implements IProgramLoader {
                 .collect(groupingBy(Operation::getDeltaT));
 
         for (Map.Entry<Integer, List<Operation>> entry : operationsByDelays.entrySet()) {
+
             long delay = getDelay(startupDate, entry.getKey());
 
-            OperationExecuteCommand command = new OperationExecuteCommand(telemetryService, entry.getValue(), messageSender, restClientService, checkedCallback());
+            OperationExecuteCommand command = new OperationExecuteCommand(telemetryService, entry.getValue(), messageSender, restClientService);
             executor.schedule(command, delay, TimeUnit.MILLISECONDS);
         }
         messageSender.stdout(LogMessage.trace(PREFIX_MSG + "Execute was schedule"));
+
+        Map<Integer, List<Operation>> operationsByTimeout = flyProgram.getOperations()
+                .stream()
+                .collect(groupingBy(operation -> operation.getDeltaT()+ operation.getTimeout()));
+
+        for (Map.Entry<Integer, List<Operation>> entry : operationsByTimeout.entrySet()) {
+            long delay = getDelay(startupDate, entry.getKey());
+            System.out.println(delay);
+            OperationExecutingCheckCommand checkCommand = new OperationExecutingCheckCommand(restClientService, telemetryService, entry.getValue(), messageSender, checkedCallback());
+            executor.schedule(checkCommand, delay, TimeUnit.MILLISECONDS);
+        }
 
         waitExecution(operationsByDelays.entrySet().size());
     }
